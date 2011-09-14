@@ -10,7 +10,7 @@ public class GridManager {
 
 	public static String getGridCellId(Point point, int tileLevel) {
 		double[] indexablesCoordinates= projectToIndexSpace(point);
-		return getCellIndex(indexablesCoordinates[0],GeometricConstants.PROJECTED_LATITUDE_RANGE,tileLevel)+"|"+getCellIndex(indexablesCoordinates[1],GeometricConstants.PROJECTED_LONGITUDE_RANGE,tileLevel);
+		return getCellIndex(indexablesCoordinates[0],GeometricConstants.PROJECTED_LONGITUDE_RANGE,tileLevel)+"|"+getCellIndex(indexablesCoordinates[1],GeometricConstants.PROJECTED_LATITUDE_RANGE,tileLevel);
 	}
 
 	public static Map<Integer,String> getGridCellIds(Point point, int minTileLevel, int maxTileLevel) {
