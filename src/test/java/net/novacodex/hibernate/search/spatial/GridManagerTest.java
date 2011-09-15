@@ -7,15 +7,15 @@ import java.util.Map;
 public class GridManagerTest {
 	@Test
 	public void getCellIndexTest() {
-		String cellIndex= GridManager.getCellIndex(0.1,0.3,1);
-		org.junit.Assert.assertEquals("0",cellIndex);
-		String cellIndex2= GridManager.getCellIndex(0.2,0.3,1);
-		org.junit.Assert.assertEquals("1",cellIndex2);
+		int cellIndex= GridManager.getCellIndex(0.1,0.3,1);
+		org.junit.Assert.assertEquals(0,cellIndex);
+		int cellIndex2= GridManager.getCellIndex(0.2,0.3,1);
+		org.junit.Assert.assertEquals(1,cellIndex2);
 
-		String cellIndex3= GridManager.getCellIndex(3,10,4);
-		org.junit.Assert.assertEquals("4",cellIndex3);
-		String cellIndex4= GridManager.getCellIndex(6,10,4);
-		org.junit.Assert.assertEquals("9",cellIndex4);
+		int cellIndex3= GridManager.getCellIndex(3,10,4);
+		org.junit.Assert.assertEquals(4,cellIndex3);
+		int cellIndex4= GridManager.getCellIndex(6,10,4);
+		org.junit.Assert.assertEquals(9,cellIndex4);
 	}
 
 	@Test
@@ -46,21 +46,21 @@ public class GridManagerTest {
 	@Test public void getGridCellIdsTest() {
 		Point point= new Point(45,4);
 
-		Map<Integer,String> cellIdsByTile= GridManager.getGridCellIds(point,0,15);
+		Map<Integer,String> cellsIdsByGridLevel= GridManager.getGridCellsIds( point, 0, 15 );
 
-		org.junit.Assert.assertEquals("0|8",cellIdsByTile.get(5));
-		org.junit.Assert.assertEquals("1|32",cellIdsByTile.get(7));
-		org.junit.Assert.assertEquals("128|4096",cellIdsByTile.get(14));
+		org.junit.Assert.assertEquals("0|8",cellsIdsByGridLevel.get(5));
+		org.junit.Assert.assertEquals( "1|32",cellsIdsByGridLevel.get( 7 ) );
+		org.junit.Assert.assertEquals( "128|4096",cellsIdsByGridLevel.get( 14 ) );
 	}
 
 	@Test
-	public void findBestTileLevelForSearchRangeTest() {
-		int bestTileLevel= GridManager.findBestTileLevelForSearchRange(50);
+	public void findBestGridLevelForSearchRangeTest() {
+		int bestGridLevel= GridManager.findBestGridLevelForSearchRange(50);
 
-		org.junit.Assert.assertEquals(9,bestTileLevel);
+		org.junit.Assert.assertEquals(9,bestGridLevel);
 
-		int bestTileLevel2= GridManager.findBestTileLevelForSearchRange(1);
+		int bestGridLevel2= GridManager.findBestGridLevelForSearchRange(1);
 
-		org.junit.Assert.assertEquals(15,bestTileLevel2);
+		org.junit.Assert.assertEquals(15,bestGridLevel2);
 	}
 }
