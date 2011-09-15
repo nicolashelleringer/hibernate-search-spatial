@@ -23,24 +23,24 @@ public class GridManagerTest {
 		Point point= new Point(45,4);
 
 		String cellId= GridManager.getGridCellId(point,5);
-		org.junit.Assert.assertEquals("0|4",cellId);
+		org.junit.Assert.assertEquals("0|8",cellId);
 
 		String cellId2= GridManager.getGridCellId(point,7);
-		org.junit.Assert.assertEquals("2|16",cellId2);
+		org.junit.Assert.assertEquals("1|32",cellId2);
 
 		String cellId3= GridManager.getGridCellId(point,14);
-		org.junit.Assert.assertEquals("257|2048",cellId3);
+		org.junit.Assert.assertEquals("128|4096",cellId3);
 
 		Point point2= new Point(-12,-179);
 
 		String cellId4= GridManager.getGridCellId(point2,5);
-		org.junit.Assert.assertEquals("-32|-2",cellId4);
+		org.junit.Assert.assertEquals("-16|-3",cellId4);
 
 		String cellId5= GridManager.getGridCellId(point2,7);
-		org.junit.Assert.assertEquals("-125|-5",cellId5);
+		org.junit.Assert.assertEquals("-63|-9",cellId5);
 
 		String cellId6= GridManager.getGridCellId(point2,14);
-		org.junit.Assert.assertEquals("-15937|-547",cellId6);
+		org.junit.Assert.assertEquals("-7969|-1093",cellId6);
 	}
 
 	@Test public void getGridCellIdsTest() {
@@ -48,9 +48,9 @@ public class GridManagerTest {
 
 		Map<Integer,String> cellIdsByTile= GridManager.getGridCellIds(point,0,15);
 
-		org.junit.Assert.assertEquals("0|4",cellIdsByTile.get(5));
-		org.junit.Assert.assertEquals("2|16",cellIdsByTile.get(7));
-		org.junit.Assert.assertEquals("257|2048",cellIdsByTile.get(14));
+		org.junit.Assert.assertEquals("0|8",cellIdsByTile.get(5));
+		org.junit.Assert.assertEquals("1|32",cellIdsByTile.get(7));
+		org.junit.Assert.assertEquals("128|4096",cellIdsByTile.get(14));
 	}
 
 	@Test
