@@ -1,7 +1,9 @@
 package net.novacodex.hibernate.search.spatial;
 
+import org.apache.lucene.analysis.NumericTokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.NumericField;
 import org.apache.solr.util.NumberUtils;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
@@ -14,10 +16,10 @@ public class SpatialFieldBridge implements FieldBridge {
 
 	@Override
 	public void set( String name, Object value, Document document, LuceneOptions luceneOptions ) {
-		Point point = (Point) value;
-
-		if ( point == null )
+		if(value==null)
 			return;
+
+		Point point = new Point(((SpatialIndexable)value).getLatitude(),((SpatialIndexable)value).getLongitude());
 
 		Map<Integer, String> cellIds = GridManager.getGridCellsIds( point, MIN_GRID_LEVEL, MAX_GRID_LEVEL );
 
@@ -25,8 +27,8 @@ public class SpatialFieldBridge implements FieldBridge {
 			document.add( new Field( "HSSI_" + Integer.toString( i ) + "_" + name, cellIds.get( i ), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS ) );
 		}
 
-		document.add( new Field( "HSSI_Latitude_" + name, NumberUtils.double2sortableStr( point.getLatitude() ), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS ) );
+		document.add( new NumericField( "HSSI_Latitude_" + name, Field.Store.YES, true ).setDoubleValue( point.getLatitude() ) );
 
-		document.add( new Field( "HSSI_Longitude_" + name, NumberUtils.double2sortableStr( point.getLongitude() ), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS ) );
+		document.add( new NumericField( "HSSI_Longitude_" + name, Field.Store.YES, true ).setDoubleValue( point.getLongitude() ) );
 	}
 }

@@ -18,14 +18,32 @@ public class POI {
 	String name;
 
 	@Field
+	double latitude;
+	@Field
+	double longitude;
+
+	@Field
 	@FieldBridge(impl=SpatialFieldBridge.class)
 	@Embedded
-	Point position;
+	public SpatialIndexable getLocation(){
+		return new SpatialIndexable() {
+			@Override
+			public double getLatitude() {
+				return latitude;
+			}
 
-	public POI(Integer id, String name, Point position) {
+			@Override
+			public double getLongitude() {
+				return longitude;
+			}
+		};
+	}
+
+	public POI(Integer id, String name, double latitude, double longitude) {
 		this.id= id;
 		this.name= name;
-		this.position= position;
+		this.latitude= latitude;
+		this.longitude=	longitude;
 	}
 
 	public POI(){}
@@ -34,11 +52,15 @@ public class POI {
 		return id;
 	}
 
-	public Point getPosition() {
-		return position;
-	}
-
 	public String getName() {
 		return name;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
 	}
 }

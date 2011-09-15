@@ -2,7 +2,9 @@ package net.novacodex.hibernate.search.spatial;
 
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Filter;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.QueryWrapperFilter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,16 +110,5 @@ public class GridManager {
 		return projectedCoordinates;
 	}
 
-	public static Filter createGridFilter( Point center, double radius, String fieldName ) {
 
-		int bestGridLevel = findBestGridLevelForSearchRange( 2.0d * radius );
-
-		List<String> gridCellsIds = getGridCellsIds( center, radius, bestGridLevel );
-
-		return new GridFilter( gridCellsIds, "HSSI_" + Integer.toString( bestGridLevel ) + "_" + fieldName );
-	}
-
-	public static Query buildSpatialQuery( Point center, double radius, String field_name ) {
-		return new ConstantScoreQuery( GridManager.createGridFilter( center, radius, field_name ) );
-	}
 }
