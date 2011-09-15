@@ -1,7 +1,5 @@
-package net.novacodex.GridManager;
+package net.novacodex.hibernate.search.spatial;
 
-import net.novacodex.GridManager.GridManager;
-import net.novacodex.GridManager.Point;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;

@@ -1,4 +1,4 @@
-package net.novacodex.GridManager;
+package net.novacodex.hibernate.search.spatial;
 
 public interface GeometricConstants {
 	public final static int LONGITUDE_DEGREE_RANGE = 360;

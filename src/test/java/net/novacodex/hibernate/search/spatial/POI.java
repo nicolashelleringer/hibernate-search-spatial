@@ -1,4 +1,4 @@
-package net.novacodex.GridManager;
+package net.novacodex.hibernate.search.spatial;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;

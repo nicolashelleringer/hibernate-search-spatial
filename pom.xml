@@ -5,10 +5,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.novacodex</groupId>
-	<artifactId>GridManager</artifactId>
+	<artifactId>hibernate-search-spatial</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>Novacodex GriManager</name>
+	<name>Novacodex Hibernate Search spatial extension</name>
 	<url>http://novacodex.net</url>
 
 	<organization>
@@ -20,7 +19,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
+			<version>${junit.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -111,8 +110,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- Libs versions -->
-		<junit.version>4.7</junit.version>
-		<novacodex.version>1.0-SNAPSHOT</novacodex.version>
+		<junit.version>4.8.2</junit.version>
 		<slf4j.version>1.6.1</slf4j.version>
 	</properties>
 

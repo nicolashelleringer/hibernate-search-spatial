@@ -1,4 +1,4 @@
-package net.novacodex.GridManager;
+package net.novacodex.hibernate.search.spatial;
 
 import java.util.HashMap;
 import java.util.Map;

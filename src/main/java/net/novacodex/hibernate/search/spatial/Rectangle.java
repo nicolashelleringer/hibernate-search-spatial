@@ -1,4 +1,4 @@
-package net.novacodex.GridManager;
+package net.novacodex.hibernate.search.spatial;
 
 public class Rectangle {
 	private Point lowerLeft;
