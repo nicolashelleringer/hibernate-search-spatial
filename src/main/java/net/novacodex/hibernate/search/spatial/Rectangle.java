@@ -1,9 +1,5 @@
 package net.novacodex.hibernate.search.spatial;
 
-import sun.plugin.dom.css.Rect;
-
-import java.lang.ref.Reference;
-
 public class Rectangle {
 	private Point lowerLeft;
 	private Point upperRight;
