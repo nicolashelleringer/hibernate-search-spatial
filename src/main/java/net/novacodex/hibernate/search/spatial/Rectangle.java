@@ -6,13 +6,11 @@ public class Rectangle {
 	private Point upperRight;
 
 	public Rectangle() {
-		this.setLowerLeft( new Point() );
-		this.setUpperRight( new Point() );
+		this( new Point(), new Point() );
 	}
 
 	public Rectangle( Rectangle rectangle ) {
-		this.setLowerLeft( rectangle.getLowerLeft() );
-		this.setUpperRight( rectangle.getUpperRight() );
+		this( rectangle.getLowerLeft(), rectangle.getUpperRight() );
 	}
 
 	public Rectangle( Point lowerLeft, Point upperRight ) {
