@@ -2,7 +2,10 @@ package net.novacodex.hibernate.search.spatial;
 
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.FieldBridge;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.NumericField;
+import org.hibernate.search.annotations.Store;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -14,15 +17,17 @@ public class POI {
 	@Id
 	Integer id;
 
-	@Field
+	@Field(store= Store.YES)
 	String name;
 
-	@Field
+	@Field(store = Store.YES, index = Index.UN_TOKENIZED)
+	@NumericField
 	double latitude;
-	@Field
+	@Field(store = Store.YES, index = Index.UN_TOKENIZED)
+	@NumericField
 	double longitude;
 
-	@Field
+	@Field(store= Store.YES)
 	@FieldBridge(impl=SpatialFieldBridge.class)
 	@Embedded
 	public SpatialIndexable getLocation(){
