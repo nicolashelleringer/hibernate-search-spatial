@@ -8,12 +8,12 @@ import org.apache.lucene.search.QueryWrapperFilter;
 
 import java.util.List;
 
-public class SpatialQueryBuilder {
+public abstract class SpatialQueryBuilder {
 
 	public static Filter createGridFilter( Point center, double radius, String fieldName ) {
 		int bestGridLevel = GridManager.findBestGridLevelForSearchRange( 2.0d * radius );
 		List<String> gridCellsIds = GridManager.getGridCellsIds( center, radius, bestGridLevel );
-		return new GridFilter( gridCellsIds, "HSSI_" + Integer.toString( bestGridLevel ) + "_" + fieldName );
+		return new GridFilter( gridCellsIds, FieldUtils.formatFieldname( bestGridLevel, fieldName ) );
 	}
 
 	public static Filter createDistanceFilter( Filter previousFilter, Point center, double radius, String fieldName ) {
@@ -32,4 +32,5 @@ public class SpatialQueryBuilder {
 	public static Query buildSpatialQuery( Point center, double radius, String fieldName ) {
 		return new ConstantScoreQuery( createDistanceFilter( createGridFilter( center, radius, fieldName ), center, radius, fieldName ) );
 	}
+
 }
