@@ -9,6 +9,10 @@ public class Point implements SpatialIndexable {
 		this( p.latitude, p.longitude );
 	}
 
+	/**
+	 * @param latitude in radians
+	 * @param longitude in radians
+	 */
 	public Point( double latitude, double longitude ) {
 
 		//Normalize in [-180;180]
