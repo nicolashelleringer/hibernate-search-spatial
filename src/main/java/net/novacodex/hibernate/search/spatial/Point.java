@@ -5,20 +5,16 @@ public class Point implements SpatialIndexable {
 	private final double latitude;
 	private final double longitude;
 
-	public Point( Point p ) {
-		this( p.latitude, p.longitude );
-	}
-
 	/**
-	 * @param latitude in radians
-	 * @param longitude in radians
+	 * @param latitude in degrees
+	 * @param longitude in degrees
 	 */
 	public Point( double latitude, double longitude ) {
 
 		//Normalize in [-180;180]
 		this.longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 
-		if ( latitude > GeometricConstants.LONGITUDE_DEGREE_MAX || latitude < GeometricConstants.LONGITUDE_DEGREE_MIN ) {
+		if ( latitude > GeometricConstants.LATITUDE_DEGREE_MAX || latitude < GeometricConstants.LATITUDE_DEGREE_MIN ) {
 			throw new IllegalArgumentException( "Illegal latitude value for Point creation" );
 		}
 

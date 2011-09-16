@@ -5,10 +5,6 @@ public class Rectangle {
 	private final Point lowerLeft;
 	private final Point upperRight;
 
-	public Rectangle( Rectangle rectangle ) {
-		this( rectangle.lowerLeft, rectangle.upperRight );
-	}
-
 	public Rectangle( Point lowerLeft, Point upperRight ) {
 		this.lowerLeft = lowerLeft;
 		this.upperRight = upperRight;
