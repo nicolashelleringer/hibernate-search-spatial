@@ -4,39 +4,22 @@ public class Point implements SpatialIndexable {
 	private double latitude;
 	private double longitude;
 
-	@Override
-	public double getLatitude() {
-		return latitude;
-	}
-
-	@Override
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLatitude( double latitude ) {
-		if ( latitude > GeometricConstants.LONGITUDE_DEGREE_MAX || latitude < GeometricConstants.LONGITUDE_DEGREE_MIN )
-			throw new IllegalArgumentException( "Illegal latitude value for Point creation" );
-
-		this.latitude = latitude;
-	}
-
-	public void setLongitude( double longitude ) {
-		//Normalize in [-180;180]
-		this.longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
-	}
-
 	public Point() {
-		this(0d, 0d);
+		this( 0d, 0d );
 	}
 
 	public Point( Point p ) {
-		this(p.latitude, p.longitude);
+		this( p.latitude, p.longitude );
 	}
 
 	public Point( double latitude, double longitude ) {
 		this.setLatitude( latitude );
 		this.setLongitude( longitude );
+	}
+
+	public void setLongitude( double longitude ) {
+		//Normalize in [-180;180]
+		this.longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 	}
 
 	public Point computeDestination( double distance, double heading ) {
@@ -62,5 +45,22 @@ public class Point implements SpatialIndexable {
 
 		// Haversine formula (http://www.movable-type.co.uk/scripts/latlong.html)
 		return Math.acos( Math.sin( point1LatitudeRadian ) * Math.sin( point2LatitudeRadian ) + Math.cos( point1LatitudeRadian ) * Math.cos( point2LatitudeRadian ) * Math.cos( point2LongitudeRadian - point1LongitudeRadian ) ) * GeometricConstants.EARTH_MEAN_RADIUS_KM;
+	}
+
+	@Override
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude( double latitude ) {
+		if ( latitude > GeometricConstants.LONGITUDE_DEGREE_MAX || latitude < GeometricConstants.LONGITUDE_DEGREE_MIN )
+			throw new IllegalArgumentException( "Illegal latitude value for Point creation" );
+
+		this.latitude = latitude;
+	}
+
+	@Override
+	public double getLongitude() {
+		return longitude;
 	}
 }
