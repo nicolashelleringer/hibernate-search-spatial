@@ -2,20 +2,16 @@ package net.novacodex.hibernate.search.spatial;
 
 public class Rectangle {
 
-	private Point lowerLeft;
-	private Point upperRight;
-
-	public Rectangle() {
-		this( new Point(), new Point() );
-	}
+	private final Point lowerLeft;
+	private final Point upperRight;
 
 	public Rectangle( Rectangle rectangle ) {
-		this( rectangle.getLowerLeft(), rectangle.getUpperRight() );
+		this( rectangle.lowerLeft, rectangle.upperRight );
 	}
 
 	public Rectangle( Point lowerLeft, Point upperRight ) {
-		this.setLowerLeft( lowerLeft );
-		this.setUpperRight( upperRight );
+		this.lowerLeft = lowerLeft;
+		this.upperRight = upperRight;
 	}
 
 	public Rectangle( Point center, double radius ) {
@@ -43,23 +39,17 @@ public class Rectangle {
 			minimumLongitude = referencePoint.computeDestination( radius, GeometricConstants.HEADING_WEST ).getLongitude();
 		}
 
-		this.setLowerLeft( new Point( minimumLatitude, minimumLongitude ) );
-		this.setUpperRight( new Point( maximumLatitude, maximumLongitude ) );
+		this.lowerLeft = new Point( minimumLatitude, minimumLongitude );
+		this.upperRight = new Point( maximumLatitude, maximumLongitude );
+
 	}
 
 	public Point getLowerLeft() {
 		return lowerLeft;
 	}
 
-	public void setLowerLeft( Point lowerLeft ) {
-		this.lowerLeft = lowerLeft;
-	}
-
 	public Point getUpperRight() {
 		return upperRight;
 	}
 
-	public void setUpperRight( Point upperRight ) {
-		this.upperRight = upperRight;
-	}
 }

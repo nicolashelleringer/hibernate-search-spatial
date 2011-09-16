@@ -1,25 +1,24 @@
 package net.novacodex.hibernate.search.spatial;
 
 public class Point implements SpatialIndexable {
-	private double latitude;
-	private double longitude;
 
-	public Point() {
-		this( 0d, 0d );
-	}
+	private final double latitude;
+	private final double longitude;
 
 	public Point( Point p ) {
 		this( p.latitude, p.longitude );
 	}
 
 	public Point( double latitude, double longitude ) {
-		this.setLatitude( latitude );
-		this.setLongitude( longitude );
-	}
 
-	public void setLongitude( double longitude ) {
 		//Normalize in [-180;180]
 		this.longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
+
+		if ( latitude > GeometricConstants.LONGITUDE_DEGREE_MAX || latitude < GeometricConstants.LONGITUDE_DEGREE_MIN ) {
+			throw new IllegalArgumentException( "Illegal latitude value for Point creation" );
+		}
+
+		this.latitude = latitude;
 	}
 
 	public Point computeDestination( double distance, double heading ) {
@@ -50,13 +49,6 @@ public class Point implements SpatialIndexable {
 	@Override
 	public double getLatitude() {
 		return latitude;
-	}
-
-	public void setLatitude( double latitude ) {
-		if ( latitude > GeometricConstants.LONGITUDE_DEGREE_MAX || latitude < GeometricConstants.LONGITUDE_DEGREE_MIN )
-			throw new IllegalArgumentException( "Illegal latitude value for Point creation" );
-
-		this.latitude = latitude;
 	}
 
 	@Override
