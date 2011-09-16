@@ -8,6 +8,8 @@ abstract class FieldUtils {
 
 	private static final String LONGITUDE_TEMPLATE = "HSSI_Longitude_%s";
 
+	private static final String GRID_CELL_ID_TEMPLATE = "%s|%s";
+
 	public static String formatFieldname( int gridLevel, String fieldName ) {
 		return String.format( FIELDNAME_TEMPLATE, gridLevel, fieldName );
 	}
@@ -18,6 +20,10 @@ abstract class FieldUtils {
 
 	public static String formatLongitude( String fieldName ) {
 		return String.format( LONGITUDE_TEMPLATE, fieldName );
+	}
+
+	public static String formatGridCellId( int longitudeCellIndex, int latitudeCellIndex ) {
+		return String.format( GRID_CELL_ID_TEMPLATE, longitudeCellIndex, latitudeCellIndex );
 	}
 
 }

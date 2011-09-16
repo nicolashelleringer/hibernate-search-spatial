@@ -13,7 +13,9 @@ abstract class GridManager {
 
 	public static String getGridCellId( Point point, int gridLevel ) {
 		double[] indexablesCoordinates = projectToIndexSpace( point );
-		return Integer.toString( getCellIndex( indexablesCoordinates[0], GeometricConstants.PROJECTED_LONGITUDE_RANGE, gridLevel ) ) + "|" + Integer.toString( getCellIndex( indexablesCoordinates[1], GeometricConstants.PROJECTED_LATITUDE_RANGE, gridLevel ) );
+		int longitudeCellIndex = getCellIndex( indexablesCoordinates[0], GeometricConstants.PROJECTED_LONGITUDE_RANGE, gridLevel );
+		int latitudeCellIndex = getCellIndex( indexablesCoordinates[1], GeometricConstants.PROJECTED_LATITUDE_RANGE, gridLevel );
+		return FieldUtils.formatGridCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
 	public static Map<Integer, String> getGridCellsIds( Point point, int minGridLevel, int maxGridLevel ) {
@@ -71,13 +73,10 @@ abstract class GridManager {
 
 		Rectangle boundingBox = new Rectangle( center, radius );
 
-		double lowerLeftLatitude, lowerLeftLongitude;
-		double upperRightLatitude, upperRightLongitude;
-
-		lowerLeftLatitude = boundingBox.getLowerLeft().getLatitude();
-		lowerLeftLongitude = boundingBox.getLowerLeft().getLongitude();
-		upperRightLatitude = boundingBox.getUpperRight().getLatitude();
-		upperRightLongitude = boundingBox.getUpperRight().getLongitude();
+		double lowerLeftLatitude = boundingBox.getLowerLeft().getLatitude();
+		double lowerLeftLongitude = boundingBox.getLowerLeft().getLongitude();
+		double upperRightLatitude = boundingBox.getUpperRight().getLatitude();
+		double upperRightLongitude = boundingBox.getUpperRight().getLongitude();
 
 		if ( upperRightLongitude < lowerLeftLongitude ) { // Box cross the 180 meridian
 			List<String> gridCellsIds;
