@@ -14,13 +14,13 @@ public class Rectangle {
 		double minimumLatitude, maximumLatitude;
 		double minimumLongitude, maximumLongitude;
 
-		if ( radius > center.distanceToPoint( new Point( GeometricConstants.LATITUDE_DEGREE_MAX, 0 ) ) ) {
+		if ( radius > center.getDistanceTo( GeometricConstants.NORTH_POLE ) ) {
 			maximumLatitude = GeometricConstants.LATITUDE_DEGREE_MAX;
 		} else {
 			maximumLatitude = center.computeDestination( radius, GeometricConstants.HEADING_NORTH ).getLatitude();
 		}
 
-		if ( radius > center.distanceToPoint( new Point( GeometricConstants.LATITUDE_DEGREE_MIN, 0 ) ) ) {
+		if ( radius > center.getDistanceTo( GeometricConstants.SOUTH_POLE ) ) {
 			minimumLatitude = GeometricConstants.LATITUDE_DEGREE_MIN;
 		} else {
 			minimumLatitude = center.computeDestination( radius, GeometricConstants.HEADING_SOUTH ).getLatitude();

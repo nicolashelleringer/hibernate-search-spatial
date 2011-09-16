@@ -26,7 +26,7 @@ public class PointTest {
 		Point point= new Point(45,4);
 		Point point2= new Point(46,14);
 
-		double distance= point.distanceToPoint(point2);
+		double distance= point.getDistanceTo( point2 );
 
 		Assert.assertEquals(distance,786.7,0.1);
 	}

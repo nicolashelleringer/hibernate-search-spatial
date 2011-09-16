@@ -15,4 +15,6 @@ interface GeometricConstants {
 	double EARTH_EQUATOR_CIRCUMFERENCE_KM = 40075.017;
 	double PROJECTED_LATITUDE_RANGE = Math.PI;
 	double PROJECTED_LONGITUDE_RANGE = 2 * Math.PI;
+	Point NORTH_POLE = new Point( LATITUDE_DEGREE_MAX, 0 );
+	Point SOUTH_POLE = new Point( LATITUDE_DEGREE_MIN, 0 );
 }

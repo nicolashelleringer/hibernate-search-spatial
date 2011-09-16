@@ -32,7 +32,7 @@ public class DistanceFilter extends Filter {
 			@Override
 			protected boolean match( int documentIndex ) {
 				Point documentPosition = new Point( latitudeValues[documentIndex], longitudeValues[documentIndex] );
-				return documentPosition.distanceToPoint( center ) <= radius;
+				return documentPosition.getDistanceTo( center ) <= radius;
 			}
 		};
 	}

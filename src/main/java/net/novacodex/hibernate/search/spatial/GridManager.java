@@ -7,6 +7,8 @@ import java.util.Map;
 
 abstract class GridManager {
 
+	private static final double LOG2 = Math.log( 2 );
+
 	public static int getCellIndex( double coordinate, double range, int gridLevel ) {
 		return (int) Math.floor( Math.pow( 2, gridLevel ) * coordinate / range );
 	}
@@ -19,8 +21,9 @@ abstract class GridManager {
 	}
 
 	public static Map<Integer, String> getGridCellsIds( Point point, int minGridLevel, int maxGridLevel ) {
-		if ( minGridLevel < 0 || maxGridLevel < minGridLevel )
+		if ( minGridLevel < 0 || maxGridLevel < minGridLevel ) {
 			return null;
+		}
 
 		Map<Integer, String> gridCellIds = new HashMap<Integer, String>();
 
@@ -92,14 +95,14 @@ abstract class GridManager {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
-		return (int) Math.ceil( Math.log( iterations ) / Math.log( 2 ) );
+		return (int) Math.ceil( Math.log( iterations ) / LOG2 );
 	}
 
 	public static double[] projectToIndexSpace( Point point ) {
 		double[] projectedCoordinates = new double[2];
 
-		projectedCoordinates[0] = Math.toRadians( point.getLongitude() ) * Math.cos( Math.toRadians( point.getLatitude() ) );
-		projectedCoordinates[1] = Math.toRadians( point.getLatitude() );
+		projectedCoordinates[0] = point.getLongitudeRad() * Math.cos( point.getLatitudeRad() );
+		projectedCoordinates[1] = point.getLatitudeRad();
 
 		return projectedCoordinates;
 	}
