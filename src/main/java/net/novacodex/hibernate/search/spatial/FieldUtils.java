@@ -22,8 +22,8 @@ abstract class FieldUtils {
 		return String.format( LONGITUDE_TEMPLATE, fieldName );
 	}
 
-	public static String formatGridCellId( int longitudeCellIndex, int latitudeCellIndex ) {
-		return String.format( GRID_CELL_ID_TEMPLATE, longitudeCellIndex, latitudeCellIndex );
+	public static String formatGridCellId( int xIndex, int yIndex ) {
+		return String.format( GRID_CELL_ID_TEMPLATE, xIndex, yIndex );
 	}
 
 }

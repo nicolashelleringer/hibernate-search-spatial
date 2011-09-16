@@ -62,7 +62,7 @@ abstract class GridManager {
 		int xIndex, yIndex;
 		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
-				gridCellsIds.add( Integer.toString( xIndex ) + "|" + Integer.toString( yIndex ) );
+				gridCellsIds.add( FieldUtils.formatGridCellId( xIndex, yIndex ) );
 			}
 		}
 
