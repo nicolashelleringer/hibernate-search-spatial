@@ -1,6 +1,6 @@
 package net.novacodex.hibernate.search.spatial;
 
-public interface GeometricConstants {
+interface GeometricConstants {
 	int LONGITUDE_DEGREE_RANGE = 360;
 	int LONGITUDE_DEGREE_MIN = -LONGITUDE_DEGREE_RANGE / 2;
 	int LONGITUDE_DEGREE_MAX = LONGITUDE_DEGREE_RANGE / 2;

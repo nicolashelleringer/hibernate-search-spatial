@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GridManager {
+abstract class GridManager {
+
 	public static int getCellIndex( double coordinate, double range, int gridLevel ) {
 		return (int) Math.floor( Math.pow( 2, gridLevel ) * coordinate / range );
 	}
@@ -103,6 +104,4 @@ public class GridManager {
 
 		return projectedCoordinates;
 	}
-
-
 }
