@@ -4,10 +4,12 @@ public class Point implements SpatialIndexable {
 	private double latitude;
 	private double longitude;
 
+	@Override
 	public double getLatitude() {
 		return latitude;
 	}
 
+	@Override
 	public double getLongitude() {
 		return longitude;
 	}
@@ -25,18 +27,16 @@ public class Point implements SpatialIndexable {
 	}
 
 	public Point() {
-		latitude = 0;
-		longitude = 0;
+		this(0d, 0d);
 	}
 
 	public Point( Point p ) {
-		this.latitude = p.latitude;
-		this.longitude = p.longitude;
+		this(p.latitude, p.longitude);
 	}
 
 	public Point( double latitude, double longitude ) {
-		setLatitude( latitude );
-		setLongitude( longitude );
+		this.setLatitude( latitude );
+		this.setLongitude( longitude );
 	}
 
 	public Point computeDestination( double distance, double heading ) {
