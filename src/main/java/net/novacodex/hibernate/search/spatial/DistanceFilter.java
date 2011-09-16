@@ -25,19 +25,14 @@ public class DistanceFilter extends Filter {
 	@Override
 	public DocIdSet getDocIdSet( IndexReader reader ) throws IOException {
 
-		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, "HSSI_Latitude_" + fieldName );
-		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, "HSSI_Longitude_" + fieldName );
+		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLatitude( fieldName ) );
+		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLongitude( fieldName ) );
 
 		return new FilteredDocIdSet( previousFilter.getDocIdSet( reader ) ) {
 			@Override
 			protected boolean match( int documentIndex ) {
-				Point documentPosition= new Point(latitudeValues[documentIndex],longitudeValues[documentIndex]);
-
-				if ( documentPosition.distanceToPoint( center ) <= radius ) {
-					return true;
-				} else {
-					return false;
-				}
+				Point documentPosition = new Point( latitudeValues[documentIndex], longitudeValues[documentIndex] );
+				return documentPosition.distanceToPoint( center ) <= radius;
 			}
 		};
 	}
