@@ -1,29 +1,29 @@
 package net.novacodex.hibernate.search.spatial;
 
-import org.apache.lucene.search.ConstantScoreQuery;
-import org.apache.lucene.search.Filter;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GridManager {
+abstract class GridManager {
+
+	private static final double LOG2 = Math.log( 2 );
+
 	public static int getCellIndex( double coordinate, double range, int gridLevel ) {
 		return (int) Math.floor( Math.pow( 2, gridLevel ) * coordinate / range );
 	}
 
 	public static String getGridCellId( Point point, int gridLevel ) {
 		double[] indexablesCoordinates = projectToIndexSpace( point );
-		return Integer.toString( getCellIndex( indexablesCoordinates[0], GeometricConstants.PROJECTED_LONGITUDE_RANGE, gridLevel ) ) + "|" + Integer.toString( getCellIndex( indexablesCoordinates[1], GeometricConstants.PROJECTED_LATITUDE_RANGE, gridLevel ) );
+		int longitudeCellIndex = getCellIndex( indexablesCoordinates[0], GeometricConstants.PROJECTED_LONGITUDE_RANGE, gridLevel );
+		int latitudeCellIndex = getCellIndex( indexablesCoordinates[1], GeometricConstants.PROJECTED_LATITUDE_RANGE, gridLevel );
+		return FieldUtils.formatGridCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
 	public static Map<Integer, String> getGridCellsIds( Point point, int minGridLevel, int maxGridLevel ) {
-		if ( minGridLevel < 0 || maxGridLevel < minGridLevel )
+		if ( minGridLevel < 0 || maxGridLevel < minGridLevel ) {
 			return null;
+		}
 
 		Map<Integer, String> gridCellIds = new HashMap<Integer, String>();
 
@@ -65,7 +65,7 @@ public class GridManager {
 		int xIndex, yIndex;
 		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
-				gridCellsIds.add( Integer.toString( xIndex ) + "|" + Integer.toString( yIndex ) );
+				gridCellsIds.add( FieldUtils.formatGridCellId( xIndex, yIndex ) );
 			}
 		}
 
@@ -76,13 +76,10 @@ public class GridManager {
 
 		Rectangle boundingBox = new Rectangle( center, radius );
 
-		double lowerLeftLatitude, lowerLeftLongitude;
-		double upperRightLatitude, upperRightLongitude;
-
-		lowerLeftLatitude = boundingBox.getLowerLeft().getLatitude();
-		lowerLeftLongitude = boundingBox.getLowerLeft().getLongitude();
-		upperRightLatitude = boundingBox.getUpperRight().getLatitude();
-		upperRightLongitude = boundingBox.getUpperRight().getLongitude();
+		double lowerLeftLatitude = boundingBox.getLowerLeft().getLatitude();
+		double lowerLeftLongitude = boundingBox.getLowerLeft().getLongitude();
+		double upperRightLatitude = boundingBox.getUpperRight().getLatitude();
+		double upperRightLongitude = boundingBox.getUpperRight().getLongitude();
 
 		if ( upperRightLongitude < lowerLeftLongitude ) { // Box cross the 180 meridian
 			List<String> gridCellsIds;
@@ -98,17 +95,15 @@ public class GridManager {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
 
-		return (int) Math.ceil( Math.log( iterations ) / Math.log( 2 ) );
+		return (int) Math.ceil( Math.log( iterations ) / LOG2 );
 	}
 
 	public static double[] projectToIndexSpace( Point point ) {
 		double[] projectedCoordinates = new double[2];
 
-		projectedCoordinates[0] = Math.toRadians( point.getLongitude() ) * Math.cos( Math.toRadians( point.getLatitude() ) );
-		projectedCoordinates[1] = Math.toRadians( point.getLatitude() );
+		projectedCoordinates[0] = point.getLongitudeRad() * Math.cos( point.getLatitudeRad() );
+		projectedCoordinates[1] = point.getLatitudeRad();
 
 		return projectedCoordinates;
 	}
-
-
 }

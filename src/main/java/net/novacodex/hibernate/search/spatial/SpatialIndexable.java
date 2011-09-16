@@ -1,6 +1,13 @@
 package net.novacodex.hibernate.search.spatial;
 
 public interface SpatialIndexable {
-	public double getLatitude();
-	public double getLongitude();
+	/**
+	 * @return the latitude in degrees
+	 */
+	double getLatitude();
+
+	/**
+	 * @return the longitude in degrees
+	 */
+	double getLongitude();
 }

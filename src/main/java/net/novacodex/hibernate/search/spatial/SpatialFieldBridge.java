@@ -1,34 +1,35 @@
 package net.novacodex.hibernate.search.spatial;
 
-import org.apache.lucene.analysis.NumericTokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.NumericField;
-import org.apache.solr.util.NumberUtils;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
 import java.util.Map;
 
 public class SpatialFieldBridge implements FieldBridge {
-	public static final int MIN_GRID_LEVEL = 0;
-	public static final int MAX_GRID_LEVEL = 16;
+
+	private static final int MIN_GRID_LEVEL = 0;
+	private static final int MAX_GRID_LEVEL = 16;
 
 	@Override
 	public void set( String name, Object value, Document document, LuceneOptions luceneOptions ) {
-		if(value==null)
-			return;
+		if ( value != null ) {
 
-		Point point = new Point(((SpatialIndexable)value).getLatitude(),((SpatialIndexable)value).getLongitude());
+			SpatialIndexable spatialIndexable  = (SpatialIndexable)value;
 
-		Map<Integer, String> cellIds = GridManager.getGridCellsIds( point, MIN_GRID_LEVEL, MAX_GRID_LEVEL );
+			Point point = new Point(  spatialIndexable .getLatitude(),  spatialIndexable .getLongitude() );
 
-		for ( int i = MIN_GRID_LEVEL; i <= MAX_GRID_LEVEL; i++ ) {
-			document.add( new Field( "HSSI_" + Integer.toString( i ) + "_" + name, cellIds.get( i ), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS ) );
+			Map<Integer, String> cellIds = GridManager.getGridCellsIds( point, MIN_GRID_LEVEL, MAX_GRID_LEVEL );
+
+			for ( int i = MIN_GRID_LEVEL; i <= MAX_GRID_LEVEL; i++ ) {
+				document.add( new Field( FieldUtils.formatFieldname( i, name ), cellIds.get( i ), Field.Store.YES, Field.Index.NOT_ANALYZED_NO_NORMS ) );
+			}
+
+			document.add( new NumericField( FieldUtils.formatLatitude( name ), Field.Store.YES, true ).setDoubleValue( point.getLatitude() ) );
+
+			document.add( new NumericField( FieldUtils.formatLongitude( name ), Field.Store.YES, true ).setDoubleValue( point.getLongitude() ) );
 		}
-
-		document.add( new NumericField( "HSSI_Latitude_" + name, Field.Store.YES, true ).setDoubleValue( point.getLatitude() ) );
-
-		document.add( new NumericField( "HSSI_Longitude_" + name, Field.Store.YES, true ).setDoubleValue( point.getLongitude() ) );
 	}
 }
