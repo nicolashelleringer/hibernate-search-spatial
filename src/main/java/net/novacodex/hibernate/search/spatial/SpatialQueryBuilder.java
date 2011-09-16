@@ -10,8 +10,7 @@ import java.util.List;
 
 public class SpatialQueryBuilder {
 
-		public static Filter createGridFilter( Point center, double radius, String fieldName ) {
-
+	public static Filter createGridFilter( Point center, double radius, String fieldName ) {
 		int bestGridLevel = GridManager.findBestGridLevelForSearchRange( 2.0d * radius );
 		List<String> gridCellsIds = GridManager.getGridCellsIds( center, radius, bestGridLevel );
 		return new GridFilter( gridCellsIds, "HSSI_" + Integer.toString( bestGridLevel ) + "_" + fieldName );
