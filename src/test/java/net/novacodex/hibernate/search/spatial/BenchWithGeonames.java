@@ -19,8 +19,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 
-public class BenchWithGeonamesFr {
+public class BenchWithGeonames {
 	public static void main( String args[] ) {
+		FullTextSession fullTextSession = null;
 		try {
 			String geonamesFile = "C:\\Dev\\hibernate-search-spatial\\geonames\\FR.txt";
 			File geonames = new File( geonamesFile );
@@ -30,27 +31,27 @@ public class BenchWithGeonamesFr {
 			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 			Session session = sessionFactory.openSession();
 			session.beginTransaction();
-			FullTextSession fullTextSession = Search.getFullTextSession( session );
+			fullTextSession = Search.getFullTextSession( session );
 			/*
-			 int i = 0;
-			 while ( ( line = buffRead.readLine() ) != null ) {
-				 String[] data = line.split( "\t" );
-				 POI current = new POI( Integer.parseInt( data[0] ), data[1], Double.parseDouble( data[4] ), Double.parseDouble( data[5] ) );
-				 session.save( current );
-				 fullTextSession.index( current );
-				 if ( ( i % 10000 ) == 0 ) {
-					 fullTextSession.flushToIndexes();
-					 session.flush();
-				 }
-				 i++;
-			 }
-			 session.getTransaction().commit();
-*/
-			Point center = new Point( 45, 4 );
-			long gridTotalDuration= 0;
-			long spatialTotalDuration= 0;
-			long doubleRangeTotalDuration= 0;
-			long distanceDoubleRangeTotalDuration= 0;
+				int line_number = 0;
+				while ( ( line = buffRead.readLine() ) != null ) {
+					String[] data = line.split( "\t" );
+					POI current = new POI( Integer.parseInt( data[0] ), data[1], Double.parseDouble( data[4] ), Double.parseDouble( data[5] ) );
+					session.save( current );
+					fullTextSession.index( current );
+					if ( ( line_number % 10000 ) == 0 ) {
+						fullTextSession.flushToIndexes();
+						session.flush();
+					}
+					line_number++;
+				}
+				session.getTransaction().commit();
+   */
+			Point center = Point.fromDegrees( 45, 4 );
+			long gridTotalDuration = 0;
+			long spatialTotalDuration = 0;
+			long doubleRangeTotalDuration = 0;
+			long distanceDoubleRangeTotalDuration = 0;
 
 			for ( int i = 0; i < 100; i++ ) {
 				//System.out.println( "With Spatial :" );
@@ -70,7 +71,7 @@ public class BenchWithGeonamesFr {
 				//System.out.print( "Duration : " );
 				//System.out.println( duration * Math.pow( 10, -9 ) );
 				//System.out.println();
-				spatialTotalDuration+= duration;
+				spatialTotalDuration += duration;
 
 				//System.out.println( "With Grid :" );
 				luceneQuery = SpatialQueryBuilder.buildGridQuery( center, 15, "location" );
@@ -88,7 +89,7 @@ public class BenchWithGeonamesFr {
 				//System.out.print( "Duration : " );
 				//System.out.println( duration * Math.pow( 10, -9 ) );
 				//System.out.println();
-				gridTotalDuration+=duration;
+				gridTotalDuration += duration;
 
 				/*
 				System.out.println( "With Distance :" );
@@ -107,7 +108,7 @@ public class BenchWithGeonamesFr {
 				System.out.println( duration * Math.pow( 10, -9 ) );
 				System.out.println();
 				*/
-				
+
 				//System.out.println( "With Double Range :" );
 				final QueryBuilder b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 				org.apache.lucene.search.Query q = b.bool().must( b.range().onField( "latitude" ).from( 44.86510175911219 ).to( 45.1348982408878 ).createQuery() ).must( b.range().onField( "longitude" ).from( 3.808774680021486 ).to( 4.191225319978514 ).createQuery() ).createQuery();
@@ -124,7 +125,7 @@ public class BenchWithGeonamesFr {
 				//System.out.print( "Duration : " );
 				//System.out.println( duration * Math.pow( 10, -9 ) );
 				//System.out.println();
-				doubleRangeTotalDuration+=duration;
+				doubleRangeTotalDuration += duration;
 
 				//System.out.println( "With Double Range + Distance :" );
 				q = b.bool().must( b.range().onField( "latitude" ).from( 44.86510175911219 ).to( 45.1348982408878 ).createQuery() ).must( b.range().onField( "longitude" ).from( 3.808774680021486 ).to( 4.191225319978514 ).createQuery() ).createQuery();
@@ -142,16 +143,20 @@ public class BenchWithGeonamesFr {
 				//System.out.print( "Duration : " );
 				//System.out.println( duration * Math.pow( 10, -9 ) );
 				//System.out.println();
-				distanceDoubleRangeTotalDuration+=duration;
+				distanceDoubleRangeTotalDuration += duration;
 			}
 
-			System.out.println(" Mean time with Grid : "+Double.toString((double)gridTotalDuration/100.0d*Math.pow( 10, -9 )));
-			System.out.println(" Mean time with Grid + Distance filter : "+Double.toString((double)spatialTotalDuration/100.0d*Math.pow( 10, -9 )));
-			System.out.println(" Mean time with DoubleRange : "+Double.toString((double)doubleRangeTotalDuration/100.0d*Math.pow( 10, -9 )));
+			System.out.println( " Mean time with Grid : " + Double.toString( (double) gridTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
+			System.out.println( " Mean time with Grid + Distance filter : " + Double.toString( (double) spatialTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
+			System.out.println( " Mean time with DoubleRange : " + Double.toString( (double) doubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
 			System.out.println( " Mean time with DoubleRange + Distance filter : " + Double.toString( (double) distanceDoubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
 
 		} catch ( Exception e ) {
 			e.printStackTrace();
+		} finally {
+			if ( fullTextSession != null ) {
+				fullTextSession.close();
+			}
 		}
 	}
 }

@@ -21,7 +21,7 @@ public abstract class SpatialQueryBuilder {
 	}
 
 	public static Filter createDoubleRangeFilter( Point center, double radius, String fieldName ) {
-		Rectangle boundingBox = new Rectangle( center, radius );
+		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 		return new DoubleRangeFilter(boundingBox,fieldName);
 	}
 
