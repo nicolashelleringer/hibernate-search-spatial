@@ -30,7 +30,7 @@
         <property name="hbm2ddl.auto">validate</property>
 
 		<property name="hibernate.search.default.directory_provider">filesystem</property>
-		<property name="hibernate.search.default.indexBase">C:/Dev/hibernate-search-spatial/indexes</property>
+		<property name="hibernate.search.default.indexBase">target/indexes</property>
 		<mapping class="net.novacodex.hibernate.search.spatial.POI"/>
 		
 	</session-factory>

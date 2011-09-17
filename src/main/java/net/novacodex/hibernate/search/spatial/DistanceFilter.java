@@ -5,6 +5,7 @@ import org.apache.lucene.search.DocIdSet;
 import org.apache.lucene.search.FieldCache;
 import org.apache.lucene.search.Filter;
 import org.apache.lucene.search.FilteredDocIdSet;
+
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
 
@@ -12,7 +13,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DistanceFilter extends Filter {
+final class DistanceFilter extends Filter {
 
 	private Filter previousFilter;
 	private Point center;
@@ -41,9 +42,10 @@ public class DistanceFilter extends Filter {
 		return new FilteredDocIdSet( previousFilter.getDocIdSet( reader ) ) {
 			@Override
 			protected boolean match( int documentIndex ) {
+
 				Double documentDistance;
 				if ( ( documentDistance = distanceCache.get( documentIndex ) ) == null ) {
-					Point documentPosition = new Point( latitudeValues[documentIndex], longitudeValues[documentIndex] );
+					Point documentPosition = Point.fromDegrees( latitudeValues[documentIndex], longitudeValues[documentIndex] );
 					documentDistance = documentPosition.getDistanceTo( center );
 				}
 				if ( documentDistance <= radius ) {

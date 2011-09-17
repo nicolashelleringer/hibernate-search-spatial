@@ -74,7 +74,7 @@ abstract class GridManager {
 
 	public static List<String> getGridCellsIds( Point center, double radius, int gridLevel ) {
 
-		Rectangle boundingBox = new Rectangle( center, radius );
+		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
 		double lowerLeftLatitude = boundingBox.getLowerLeft().getLatitude();
 		double lowerLeftLongitude = boundingBox.getLowerLeft().getLongitude();
@@ -83,11 +83,11 @@ abstract class GridManager {
 
 		if ( upperRightLongitude < lowerLeftLongitude ) { // Box cross the 180 meridian
 			List<String> gridCellsIds;
-			gridCellsIds = getGridCellsIds( new Point( lowerLeftLatitude, lowerLeftLongitude ), new Point( upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ), gridLevel );
-			gridCellsIds.addAll( getGridCellsIds( new Point( lowerLeftLatitude, -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ), new Point( upperRightLatitude, upperRightLongitude ), gridLevel ) );
+			gridCellsIds = getGridCellsIds( Point.fromDegrees( lowerLeftLatitude, lowerLeftLongitude ), Point.fromDegrees( upperRightLatitude, GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ), gridLevel );
+			gridCellsIds.addAll( getGridCellsIds( Point.fromDegrees( lowerLeftLatitude, -GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ), Point.fromDegrees( upperRightLatitude, upperRightLongitude ), gridLevel ) );
 			return gridCellsIds;
 		} else {
-			return getGridCellsIds( new Point( lowerLeftLatitude, lowerLeftLongitude ), new Point( upperRightLatitude, upperRightLongitude ), gridLevel );
+			return getGridCellsIds( Point.fromDegrees( lowerLeftLatitude, lowerLeftLongitude ), Point.fromDegrees( upperRightLatitude, upperRightLongitude ), gridLevel );
 		}
 	}
 

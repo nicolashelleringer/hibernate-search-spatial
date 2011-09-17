@@ -17,9 +17,9 @@ public class SpatialFieldBridge implements FieldBridge {
 	public void set( String name, Object value, Document document, LuceneOptions luceneOptions ) {
 		if ( value != null ) {
 
-			SpatialIndexable spatialIndexable  = (SpatialIndexable)value;
+			SpatialIndexable spatialIndexable = (SpatialIndexable) value;
 
-			Point point = new Point(  spatialIndexable .getLatitude(),  spatialIndexable .getLongitude() );
+			Point point = Point.fromDegrees( spatialIndexable.getLatitude(), spatialIndexable.getLongitude() );
 
 			Map<Integer, String> cellIds = GridManager.getGridCellsIds( point, MIN_GRID_LEVEL, MAX_GRID_LEVEL );
 

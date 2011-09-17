@@ -12,10 +12,10 @@ import org.apache.lucene.util.OpenBitSet;
 import java.io.IOException;
 import java.util.List;
 
-public class GridFilter extends Filter {
+final class GridFilter extends Filter {
 
-	private List<String> gridCellsIds;
-	private String fieldName;
+	private final List<String> gridCellsIds;
+	private final String fieldName;
 
 	public GridFilter( List<String> gridCellsIds, String fieldName ) {
 		this.gridCellsIds = gridCellsIds;
@@ -24,18 +24,17 @@ public class GridFilter extends Filter {
 
 	@Override
 	public DocIdSet getDocIdSet( IndexReader reader ) throws IOException {
-		if ( gridCellsIds.size() == 0 )
+		if ( gridCellsIds.size() == 0 ) {
 			return null;
+		}
 
 		OpenBitSet matchedDocumentsIds = new OpenBitSet( reader.maxDoc() );
-		Long docIdNb = 0L;
 		for ( int i = 0; i < gridCellsIds.size(); i++ ) {
 			Term gridCellTerm = new Term( fieldName, gridCellsIds.get( i ) );
 			TermDocs gridCellsDocs = reader.termDocs( gridCellTerm );
 			if ( gridCellsDocs != null ) {
 				while ( gridCellsDocs.next() ) {
 					matchedDocumentsIds.fastSet( gridCellsDocs.doc() );
-					docIdNb++;
 				}
 			}
 		}
