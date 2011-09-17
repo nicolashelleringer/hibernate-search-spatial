@@ -12,27 +12,30 @@ import org.apache.lucene.util.OpenBitSet;
 import java.io.IOException;
 import java.util.List;
 
-public class GridFilter extends Filter{
+public class GridFilter extends Filter {
 
 	private List<String> gridCellsIds;
 	private String fieldName;
 
-	public GridFilter(List<String> gridCellsIds, String fieldName) {
-		this.gridCellsIds= gridCellsIds;
-		this.fieldName= fieldName;
+	public GridFilter( List<String> gridCellsIds, String fieldName ) {
+		this.gridCellsIds = gridCellsIds;
+		this.fieldName = fieldName;
 	}
 
 	@Override
 	public DocIdSet getDocIdSet( IndexReader reader ) throws IOException {
-		if(gridCellsIds.size()==0) return null;
+		if ( gridCellsIds.size() == 0 )
+			return null;
 
-		OpenBitSet matchedDocumentsIds= new OpenBitSet(reader.maxDoc());
-		for(int i=0;i<gridCellsIds.size();i++) {
-			Term gridCellTerm= new Term(fieldName,gridCellsIds.get( i ));
-			TermDocs gridCellsDocs= reader.termDocs( gridCellTerm );
-			if(gridCellsDocs!=null) {
-				while(gridCellsDocs.next()){
-					matchedDocumentsIds.fastSet(gridCellsDocs.doc());
+		OpenBitSet matchedDocumentsIds = new OpenBitSet( reader.maxDoc() );
+		Long docIdNb = 0L;
+		for ( int i = 0; i < gridCellsIds.size(); i++ ) {
+			Term gridCellTerm = new Term( fieldName, gridCellsIds.get( i ) );
+			TermDocs gridCellsDocs = reader.termDocs( gridCellTerm );
+			if ( gridCellsDocs != null ) {
+				while ( gridCellsDocs.next() ) {
+					matchedDocumentsIds.fastSet( gridCellsDocs.doc() );
+					docIdNb++;
 				}
 			}
 		}
