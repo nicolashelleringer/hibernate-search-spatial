@@ -8,7 +8,7 @@ import org.apache.lucene.search.FilteredDocIdSet;
 
 import java.io.IOException;
 
-public class DistanceFilter extends Filter {
+final class DistanceFilter extends Filter {
 
 	private Filter previousFilter;
 	private Point center;
@@ -31,7 +31,7 @@ public class DistanceFilter extends Filter {
 		return new FilteredDocIdSet( previousFilter.getDocIdSet( reader ) ) {
 			@Override
 			protected boolean match( int documentIndex ) {
-				Point documentPosition = new Point( latitudeValues[documentIndex], longitudeValues[documentIndex] );
+				Point documentPosition = Point.fromDegrees( latitudeValues[documentIndex], longitudeValues[documentIndex] );
 				return documentPosition.getDistanceTo( center ) <= radius;
 			}
 		};

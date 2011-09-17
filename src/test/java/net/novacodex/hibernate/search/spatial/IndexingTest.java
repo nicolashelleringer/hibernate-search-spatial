@@ -30,7 +30,7 @@ public class IndexingTest {
 		}
 
 		try {
-			Point center = new Point( 24, 31.5 ); // 50.79 km from 24.32
+			Point center = Point.fromDegrees( 24, 31.5 ); // 50.79 km fromBoundingCircle 24.32
 
 			org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildGridQuery( center, 50, "location" );
 			org.hibernate.Query hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );

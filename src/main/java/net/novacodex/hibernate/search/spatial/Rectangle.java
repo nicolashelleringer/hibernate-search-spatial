@@ -1,6 +1,6 @@
 package net.novacodex.hibernate.search.spatial;
 
-public class Rectangle {
+final class Rectangle {
 
 	private final Point lowerLeft;
 	private final Point upperRight;
@@ -10,7 +10,7 @@ public class Rectangle {
 		this.upperRight = upperRight;
 	}
 
-	public Rectangle( Point center, double radius ) {
+	public static Rectangle fromBoundingCircle( Point center, double radius ) {
 		double minimumLatitude, maximumLatitude;
 		double minimumLongitude, maximumLongitude;
 
@@ -30,14 +30,12 @@ public class Rectangle {
 			maximumLongitude = GeometricConstants.LONGITUDE_DEGREE_MAX;
 			minimumLongitude = GeometricConstants.LONGITUDE_DEGREE_MIN;
 		} else {
-			Point referencePoint = new Point( Math.max( Math.abs( minimumLatitude ), Math.abs( maximumLatitude ) ), center.getLongitude() );
+			Point referencePoint = Point.fromDegrees( Math.max( Math.abs( minimumLatitude ), Math.abs( maximumLatitude ) ), center.getLongitude() );
 			maximumLongitude = referencePoint.computeDestination( radius, GeometricConstants.HEADING_EAST ).getLongitude();
 			minimumLongitude = referencePoint.computeDestination( radius, GeometricConstants.HEADING_WEST ).getLongitude();
 		}
 
-		this.lowerLeft = new Point( minimumLatitude, minimumLongitude );
-		this.upperRight = new Point( maximumLatitude, maximumLongitude );
-
+		return new Rectangle( Point.fromDegrees( minimumLatitude, minimumLongitude ), Point.fromDegrees( maximumLatitude, maximumLongitude ) );
 	}
 
 	public Point getLowerLeft() {

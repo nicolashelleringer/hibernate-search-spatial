@@ -6,28 +6,28 @@ import org.junit.Test;
 public class PointTest {
 	@Test
 	public void normalizeTest() {
-		Point point= new Point(45,517);
-		Assert.assertTrue( point.getLatitude() == 45 );
-		Assert.assertTrue(point.getLongitude()==157);
+		Point point = Point.fromDegrees( 45, 517 );
+		Assert.assertEquals( 45, point.getLatitude(), 0 );
+		Assert.assertEquals( 157, point.getLongitude(), 0 );
 	}
 
 	@Test
 	public void computeDestinationTest() {
-		Point point= new Point(45,4);
+		Point point = Point.fromDegrees( 45, 4 );
 
-		Point destination= point.computeDestination( 100, 45);
+		Point destination = point.computeDestination( 100, 45 );
 
-		Assert.assertEquals(Math.toRadians(destination.getLatitude()),0.796432523,0.00001);
-		Assert.assertEquals(Math.toRadians(destination.getLongitude()),0.08568597,0.00001);
+		Assert.assertEquals( destination.getLatitudeRad(), 0.796432523, 0.00001 );
+		Assert.assertEquals( destination.getLongitudeRad(), 0.08568597, 0.00001 );
 	}
 
 	@Test
 	public void distanceToPoint() {
-		Point point= new Point(45,4);
-		Point point2= new Point(46,14);
+		Point point = Point.fromDegrees( 45, 4 );
+		Point point2 = Point.fromDegrees( 46, 14 );
 
-		double distance= point.getDistanceTo( point2 );
+		double distance = point.getDistanceTo( point2 );
 
-		Assert.assertEquals(distance,786.7,0.1);
+		Assert.assertEquals( distance, 786.7, 0.1 );
 	}
 }
