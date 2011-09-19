@@ -17,8 +17,8 @@ public class PointTest {
 
 		Point destination = point.computeDestination( 100, 45 );
 
-		Assert.assertEquals( destination.getLatitudeRad(), 0.796432523, 0.00001 );
-		Assert.assertEquals( destination.getLongitudeRad(), 0.08568597, 0.00001 );
+		Assert.assertEquals( 0.796432523, destination.getLatitudeRad(), 0.00001 );
+		Assert.assertEquals( 0.08568597, destination.getLongitudeRad(), 0.00001 );
 	}
 
 	@Test
@@ -28,6 +28,6 @@ public class PointTest {
 
 		double distance = point.getDistanceTo( point2 );
 
-		Assert.assertEquals( distance, 786.7, 0.1 );
+		Assert.assertEquals( 786.7, distance, 0.1 );
 	}
 }

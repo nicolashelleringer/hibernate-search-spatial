@@ -2,10 +2,8 @@ package net.novacodex.hibernate.search.spatial;
 
 final class Point implements SpatialIndexable {
 
-	private final double latitudeDeg;
-	private final double latitudeRad;
-	private final double longitudeDeg;
-	private final double longitudeRad;
+	private final double latitude;
+	private final double longitude;
 
 	/**
 	 * @param latitude  in degrees
@@ -37,43 +35,41 @@ final class Point implements SpatialIndexable {
 	 * @param longitude in degrees
 	 */
 	private Point( double latitude, double longitude ) {
-		this.latitudeDeg = latitude;
-		this.longitudeDeg = longitude;
-		this.latitudeRad = Math.toRadians( latitude );
-		this.longitudeRad = Math.toRadians( longitude );
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
 	public Point computeDestination( double distance, double heading ) {
 		double headingRadian = Math.toRadians( heading );
 
-		// Haversine formula (http://www.movable-type.co.uk/scripts/latlong.html)
-		double destinationLatitudeRadian = Math.asin( Math.sin( latitudeRad ) * Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) + Math.cos( latitudeRad ) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos( headingRadian ) );
+		// http://www.movable-type.co.uk/scripts/latlong.html
+		double destinationLatitudeRadian = Math.asin( Math.sin( getLatitudeRad() ) * Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) + Math.cos( getLatitudeRad() ) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos( headingRadian ) );
 
-		double destinationLongitudeRadian = longitudeRad + Math.atan2( Math.sin( headingRadian ) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos( latitudeRad ), Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) - Math.sin( latitudeRad ) * Math.sin( destinationLatitudeRadian ) );
+		double destinationLongitudeRadian = getLongitudeRad() + Math.atan2( Math.sin( headingRadian ) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos( getLatitudeRad() ), Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) - Math.sin( getLatitudeRad() ) * Math.sin( destinationLatitudeRadian ) );
 
 		return fromRadians( destinationLatitudeRadian, destinationLongitudeRadian );
 	}
 
 	public double getDistanceTo( Point other ) {
-		// Haversine formula (http://www.movable-type.co.uk/scripts/latlong.html)
-		return Math.acos( Math.sin( latitudeRad ) * Math.sin( other.latitudeRad ) + Math.cos( latitudeRad ) * Math.cos( other.latitudeRad ) * Math.cos( other.longitudeRad - longitudeRad ) ) * GeometricConstants.EARTH_MEAN_RADIUS_KM;
+		// Spherical Law of Cosines (http://www.movable-type.co.uk/scripts/latlong.html)
+		return Math.acos( Math.sin( getLatitudeRad() ) * Math.sin( other.getLatitudeRad() ) + Math.cos( getLatitudeRad() ) * Math.cos( other.getLatitudeRad() ) * Math.cos( other.getLongitudeRad() - getLongitudeRad() ) ) * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}
 
 	@Override
 	public double getLatitude() {
-		return latitudeDeg;
-	}
-
-	public double getLatitudeRad() {
-		return latitudeRad;
+		return latitude;
 	}
 
 	@Override
 	public double getLongitude() {
-		return longitudeDeg;
+		return longitude;
+	}
+
+	public double getLatitudeRad() {
+		return Math.toRadians( latitude );
 	}
 
 	public double getLongitudeRad() {
-		return longitudeRad;
+		return Math.toRadians( longitude );
 	}
 }
