@@ -11,6 +11,7 @@ final class Rectangle {
 	}
 
 	public static Rectangle fromBoundingCircle( Point center, double radius ) {
+		// http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 		double minimumLatitude, maximumLatitude;
 		double minimumLongitude, maximumLongitude;
 
