@@ -19,18 +19,16 @@ final class DistanceFilter extends Filter {
 	private Point center;
 	private double radius;
 	private String fieldName;
-	private Map<Integer, Double> distanceCache;
 
 	public DistanceFilter( Filter previousFilter, Point center, double radius, String fieldName ) {
-		if(previousFilter!=null) {
+		if ( previousFilter != null ) {
 			this.previousFilter = previousFilter;
 		} else {
-			this.previousFilter= new QueryWrapperFilter( new MatchAllDocsQuery() );
+			this.previousFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		}
 		this.center = center;
 		this.radius = radius;
 		this.fieldName = fieldName;
-		this.distanceCache = new HashMap<Integer, Double>();
 	}
 
 	@Override
@@ -39,17 +37,20 @@ final class DistanceFilter extends Filter {
 		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLatitude( fieldName ) );
 		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLongitude( fieldName ) );
 
-		return new FilteredDocIdSet( previousFilter.getDocIdSet( reader ) ) {
+		DocIdSet docs = previousFilter.getDocIdSet( reader );
+
+		if ( ( docs == null ) || ( docs.iterator() == null ) ) {
+			return null;
+		}
+
+		return new FilteredDocIdSet( docs ) {
 			@Override
 			protected boolean match( int documentIndex ) {
 
 				Double documentDistance;
-				if ( ( documentDistance = distanceCache.get( documentIndex ) ) == null ) {
-					Point documentPosition = Point.fromDegrees( latitudeValues[documentIndex], longitudeValues[documentIndex] );
-					documentDistance = documentPosition.getDistanceTo( center );
-				}
+				Point documentPosition = Point.fromDegrees( latitudeValues[documentIndex], longitudeValues[documentIndex] );
+				documentDistance = documentPosition.getDistanceTo( center );
 				if ( documentDistance <= radius ) {
-					//System.out.println( documentDistance );
 					return true;
 				} else {
 					return false;

@@ -21,129 +21,110 @@ import java.util.List;
 
 public class BenchWithGeonames {
 	public static void main( String args[] ) {
+		Session session = null;
 		FullTextSession fullTextSession = null;
 		try {
-			String geonamesFile = "C:\\Dev\\hibernate-search-spatial\\geonames\\FR.txt";
-			File geonames = new File( geonamesFile );
-			BufferedReader buffRead = new BufferedReader( new FileReader( geonames ) );
-			String line = null;
-
 			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
-			Session session = sessionFactory.openSession();
+
+			session = sessionFactory.openSession();
 			session.beginTransaction();
 			fullTextSession = Search.getFullTextSession( session );
-			/*
-				int line_number = 0;
-				while ( ( line = buffRead.readLine() ) != null ) {
-					String[] data = line.split( "\t" );
-					POI current = new POI( Integer.parseInt( data[0] ), data[1], Double.parseDouble( data[4] ), Double.parseDouble( data[5] ) );
-					session.save( current );
-					fullTextSession.index( current );
-					if ( ( line_number % 10000 ) == 0 ) {
-						fullTextSession.flushToIndexes();
-						session.flush();
-					}
-					line_number++;
-				}
-				session.getTransaction().commit();
-   */
-			Point center = Point.fromDegrees( 45, 4 );
+
 			long gridTotalDuration = 0;
 			long spatialTotalDuration = 0;
 			long doubleRangeTotalDuration = 0;
 			long distanceDoubleRangeTotalDuration = 0;
 
-			for ( int i = 0; i < 100; i++ ) {
-				//System.out.println( "With Spatial :" );
-				org.apache.lucene.search.Query luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, 15, "location" );
-				FullTextQuery hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+			org.apache.lucene.search.Query luceneQuery;
+			long startTime, endTime, duration;
+			FullTextQuery hibQuery;
+			List results;
+			QueryBuilder b;
+			org.apache.lucene.search.Query q;
+			final Integer iterations = 200;
+			final Integer warmUp = 25;
+
+			for ( int i = 0; i < iterations; i++ ) {
+				Point center = Point.fromDegrees( Math.random() * 180 - 90, Math.random() * 360 - 180 );
+				double radius = 25.0d;
+				Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
+
+				session = sessionFactory.openSession();
+				session.beginTransaction();
+				fullTextSession = Search.getFullTextSession( session );
+				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+				q = b.bool().must( b.range().onField( "latitude" ).from( boundingBox.getLowerLeft().getLatitude() ).to( boundingBox.getUpperRight().getLatitude() ).createQuery() ).must( b.range().onField( "longitude" ).from( boundingBox.getLowerLeft().getLongitude() ).to( boundingBox.getUpperRight().getLongitude() ).createQuery() ).createQuery();
+				hibQuery = fullTextSession.createFullTextQuery( q, POI.class );
 				hibQuery.setProjection( "id", "name" );
-				long startTime = System.nanoTime();
-				long endTime;
-				List results;
+				startTime = System.nanoTime();
 				try {
-					results = hibQuery.list();
+					hibQuery.getResultSize();
 				} finally {
 					endTime = System.nanoTime();
 				}
-				long duration = endTime - startTime;
-				//System.out.println( "Found " + Integer.toString( results.size() ) );
-				//System.out.print( "Duration : " );
-				//System.out.println( duration * Math.pow( 10, -9 ) );
-				//System.out.println();
-				spatialTotalDuration += duration;
+				duration = endTime - startTime;
+				if ( i > ( iterations - warmUp ) ) {
+					doubleRangeTotalDuration += duration;
+				}
+				session.close();
 
-				//System.out.println( "With Grid :" );
-				luceneQuery = SpatialQueryBuilder.buildGridQuery( center, 15, "location" );
+				session = sessionFactory.openSession();
+				session.beginTransaction();
+				fullTextSession = Search.getFullTextSession( session );
+				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+				q = b.bool().must( b.range().onField( "latitude" ).from( boundingBox.getLowerLeft().getLatitude() ).to( boundingBox.getUpperRight().getLatitude() ).createQuery() ).must( b.range().onField( "longitude" ).from( boundingBox.getLowerLeft().getLongitude() ).to( boundingBox.getUpperRight().getLongitude() ).createQuery() ).createQuery();
+				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery( SpatialQueryBuilder.createDistanceFilter( new QueryWrapperFilter( q ), center, radius, "location" ) );
+				hibQuery = fullTextSession.createFullTextQuery( filteredQuery, POI.class );
+				hibQuery.setProjection( "id", "name" );
+				startTime = System.nanoTime();
+				try {
+					hibQuery.getResultSize();
+				} finally {
+					endTime = System.nanoTime();
+				}
+				duration = endTime - startTime;
+				if ( i > ( iterations - warmUp ) ) {
+					distanceDoubleRangeTotalDuration += duration;
+				}
+				session.close();
+
+				session = sessionFactory.openSession();
+				session.beginTransaction();
+				fullTextSession = Search.getFullTextSession( session );
+				luceneQuery = SpatialQueryBuilder.buildGridQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 
 				try {
-					results = hibQuery.list();
+					hibQuery.getResultSize();
 				} finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
-				//System.out.println( "Found " + Integer.toString( results.size() ) );
-				//System.out.print( "Duration : " );
-				//System.out.println( duration * Math.pow( 10, -9 ) );
-				//System.out.println();
-				gridTotalDuration += duration;
+				if ( i > ( iterations - warmUp ) ) {
+					gridTotalDuration += duration;
+				}
+				session.close();
 
-				/*
-				System.out.println( "With Distance :" );
-				luceneQuery = SpatialQueryBuilder.buildDistanceQuery( center, 15, "location" );
+				session = sessionFactory.openSession();
+				session.beginTransaction();
+				fullTextSession = Search.getFullTextSession( session );
+				luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
-				try {
-					results = hibQuery.list();
-				} finally {
-					endTime = System.nanoTime();
-				}
-				duration = endTime - startTime;
-				System.out.println( "Found " + Integer.toString( results.size() ) );
-				System.out.print( "Duration : " );
-				System.out.println( duration * Math.pow( 10, -9 ) );
-				System.out.println();
-				*/
 
-				//System.out.println( "With Double Range :" );
-				final QueryBuilder b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
-				org.apache.lucene.search.Query q = b.bool().must( b.range().onField( "latitude" ).from( 44.86510175911219 ).to( 45.1348982408878 ).createQuery() ).must( b.range().onField( "longitude" ).from( 3.808774680021486 ).to( 4.191225319978514 ).createQuery() ).createQuery();
-				FullTextQuery hq = fullTextSession.createFullTextQuery( q, POI.class );
-				hq.setProjection( "id", "name" );
-				startTime = System.nanoTime();
 				try {
-					results = hq.list();
+					hibQuery.getResultSize();
 				} finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
-				//System.out.println( "Found " + Integer.toString( results.size() ) );
-				//System.out.print( "Duration : " );
-				//System.out.println( duration * Math.pow( 10, -9 ) );
-				//System.out.println();
-				doubleRangeTotalDuration += duration;
-
-				//System.out.println( "With Double Range + Distance :" );
-				q = b.bool().must( b.range().onField( "latitude" ).from( 44.86510175911219 ).to( 45.1348982408878 ).createQuery() ).must( b.range().onField( "longitude" ).from( 3.808774680021486 ).to( 4.191225319978514 ).createQuery() ).createQuery();
-				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery( SpatialQueryBuilder.createDistanceFilter( new QueryWrapperFilter( q ), center, 15, "location" ) );
-				hq = fullTextSession.createFullTextQuery( filteredQuery, POI.class );
-				hq.setProjection( "id", "name" );
-				startTime = System.nanoTime();
-				try {
-					results = hq.list();
-				} finally {
-					endTime = System.nanoTime();
+				if ( i > ( iterations - warmUp ) ) {
+					spatialTotalDuration += duration;
 				}
-				duration = endTime - startTime;
-				//System.out.println( "Found " + Integer.toString( results.size() ) );
-				//System.out.print( "Duration : " );
-				//System.out.println( duration * Math.pow( 10, -9 ) );
-				//System.out.println();
-				distanceDoubleRangeTotalDuration += duration;
+				session.close();
 			}
 
 			System.out.println( " Mean time with Grid : " + Double.toString( (double) gridTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
@@ -154,8 +135,51 @@ public class BenchWithGeonames {
 		} catch ( Exception e ) {
 			e.printStackTrace();
 		} finally {
-			if ( fullTextSession != null ) {
-				fullTextSession.close();
+			if ( session != null && session.isOpen() ) {
+				session.close();
+			}
+		}
+	}
+
+	public void LoadGeonames() {
+		Session session = null;
+		FullTextSession fullTextSession = null;
+		try {
+			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+
+			session = sessionFactory.openSession();
+			session.beginTransaction();
+			fullTextSession = Search.getFullTextSession( session );
+
+			String geonamesFileName = "geonames\\allcountries.txt";
+			File geonamesFiles = new File( geonamesFileName );
+			BufferedReader buffRead = new BufferedReader( new FileReader( geonamesFiles ) );
+			String line = null;
+
+			int line_number = 0;
+			while ( ( line = buffRead.readLine() ) != null ) {
+				String[] data = line.split( "\t" );
+				POI current = new POI( Integer.parseInt( data[0] ), data[1], Double.parseDouble( data[4] ), Double.parseDouble( data[5] ) );
+				session.save( current );
+				if ( ( line_number % 10000 ) == 0 ) {
+					fullTextSession.flushToIndexes();
+					session.getTransaction().commit();
+					session.close();
+					session = sessionFactory.openSession();
+					session.beginTransaction();
+					fullTextSession = Search.getFullTextSession( session );
+					session.beginTransaction();
+					System.out.println( Integer.toString( line_number ) );
+				}
+				line_number++;
+			}
+			session.getTransaction().commit();
+			session.close();
+		} catch ( Exception e ) {
+			e.printStackTrace();
+		} finally {
+			if ( session != null && session.isOpen() ) {
+				session.close();
 			}
 		}
 	}
