@@ -10,7 +10,7 @@ abstract class FieldUtils {
 
 	private static final String GRID_CELL_ID_TEMPLATE = "%s|%s";
 
-	public static String formatFieldname( int gridLevel, String fieldName ) {
+	public static String formatFieldName( int gridLevel, String fieldName ) {
 		return String.format( FIELDNAME_TEMPLATE, gridLevel, fieldName );
 	}
 

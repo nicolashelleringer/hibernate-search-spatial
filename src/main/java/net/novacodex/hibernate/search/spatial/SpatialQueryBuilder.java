@@ -12,17 +12,15 @@ public abstract class SpatialQueryBuilder {
 
 	public static Filter createGridFilter( Point center, double radius, String fieldName ) {
 		int bestGridLevel = GridManager.findBestGridLevelForSearchRange( 2.0d * radius );
+		if ( bestGridLevel > SpatialFieldBridge.MAX_GRID_LEVEL ) {
+			bestGridLevel = SpatialFieldBridge.MAX_GRID_LEVEL;
+		}
 		List<String> gridCellsIds = GridManager.getGridCellsIds( center, radius, bestGridLevel );
-		return new GridFilter( gridCellsIds, FieldUtils.formatFieldname( bestGridLevel, fieldName ) );
+		return new GridFilter( gridCellsIds, FieldUtils.formatFieldName( bestGridLevel, fieldName ) );
 	}
 
 	public static Filter createDistanceFilter( Filter previousFilter, Point center, double radius, String fieldName ) {
 		return new DistanceFilter( previousFilter, center, radius, fieldName );
-	}
-
-	public static Filter createDoubleRangeFilter( Point center, double radius, String fieldName ) {
-		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
-		return new DoubleRangeFilter(boundingBox,fieldName);
 	}
 
 	public static Query buildGridQuery( Point center, double radius, String fieldName ) {
@@ -36,9 +34,5 @@ public abstract class SpatialQueryBuilder {
 
 	public static Query buildSpatialQuery( Point center, double radius, String fieldName ) {
 		return new ConstantScoreQuery( createDistanceFilter( createGridFilter( center, radius, fieldName ), center, radius, fieldName ) );
-	}
-
-	public static Query buildDoubleRangeQuery( Point center, double radius, String fieldName ) {
-		return new ConstantScoreQuery( createDoubleRangeFilter( center, radius, fieldName ) );
 	}
 }
