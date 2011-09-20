@@ -1,11 +1,11 @@
 <!-- http://blog.xebia.fr/2010/07/07/java-en-production-les-fichiers-de-logs/ -->
 <configuration scan="true">
 
-	<property name="LOGS_FOLDER" value="/logs" />
-	<property name="LOGS_ARCHIVE" value="/logs-archive" />
+	<property name="LOGS_FOLDER" value="target/logs" />
+	<property name="LOGS_ARCHIVE" value="${LOGS_FOLDER}/logs-archive" />
 
 	<appender name="log-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${LOGS_FOLDER}/odyssey.log</file>
+		<file>${LOGS_FOLDER}/hibernate-search-spatial.log</file>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>WARN</level>
 		</filter>
