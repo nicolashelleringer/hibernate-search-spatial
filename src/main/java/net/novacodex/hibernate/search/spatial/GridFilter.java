@@ -15,13 +15,13 @@ final class GridFilter extends Filter {
 	private final List<String> gridCellsIds;
 	private final String fieldName;
 
-	public GridFilter( List<String> gridCellsIds, String fieldName ) {
+	public GridFilter(List<String> gridCellsIds, String fieldName) {
 		this.gridCellsIds = gridCellsIds;
 		this.fieldName = fieldName;
 	}
 
 	@Override
-	public DocIdSet getDocIdSet( IndexReader reader ) throws IOException {
+	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		if ( gridCellsIds.size() == 0 ) {
 			return null;
 		}
@@ -41,7 +41,8 @@ final class GridFilter extends Filter {
 
 		if ( found ) {
 			return matchedDocumentsIds;
-		} else {
+		}
+		else {
 			return null;
 		}
 	}

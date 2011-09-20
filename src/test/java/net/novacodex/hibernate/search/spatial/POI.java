@@ -17,7 +17,7 @@ public class POI {
 	@Id
 	Integer id;
 
-	@Field(store= Store.YES)
+	@Field(store = Store.YES)
 	String name;
 
 	@Field(store = Store.YES, index = Index.UN_TOKENIZED)
@@ -27,10 +27,10 @@ public class POI {
 	@NumericField
 	double longitude;
 
-	@Field(store= Store.YES)
-	@FieldBridge(impl=SpatialFieldBridge.class)
+	@Field(store = Store.YES)
+	@FieldBridge(impl = SpatialFieldBridge.class)
 	@Embedded
-	public SpatialIndexable getLocation(){
+	public SpatialIndexable getLocation() {
 		return new SpatialIndexable() {
 			@Override
 			public double getLatitude() {
@@ -45,13 +45,14 @@ public class POI {
 	}
 
 	public POI(Integer id, String name, double latitude, double longitude) {
-		this.id= id;
-		this.name= name;
-		this.latitude= latitude;
-		this.longitude=	longitude;
+		this.id = id;
+		this.name = name;
+		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 
-	public POI(){}
+	public POI() {
+	}
 
 	public Integer getId() {
 		return id;

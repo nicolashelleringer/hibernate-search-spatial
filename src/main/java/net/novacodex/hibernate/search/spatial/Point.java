@@ -6,11 +6,12 @@ final class Point implements SpatialIndexable {
 	private final double longitude;
 
 	/**
-	 * @param latitude  in degrees
+	 * @param latitude in degrees
 	 * @param longitude in degrees
+	 *
 	 * @return a point with coordinates given in degrees
 	 */
-	public static Point fromDegrees( double latitude, double longitude ) {
+	public static Point fromDegrees(double latitude, double longitude) {
 		// Normalize longitude in [-180;180]
 		longitude = ( ( longitude + ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 ) ) % GeometricConstants.LONGITUDE_DEGREE_RANGE ) - ( GeometricConstants.LONGITUDE_DEGREE_RANGE / 2 );
 
@@ -22,37 +23,55 @@ final class Point implements SpatialIndexable {
 	}
 
 	/**
-	 * @param latitude  in radians
+	 * @param latitude in radians
 	 * @param longitude in radians
+	 *
 	 * @return a point with coordinates given in radians
 	 */
-	public static Point fromRadians( double latitude, double longitude ) {
+	public static Point fromRadians(double latitude, double longitude) {
 		return fromDegrees( Math.toDegrees( latitude ), Math.toDegrees( longitude ) );
 	}
 
 	/**
-	 * @param latitude  in degrees
+	 * @param latitude in degrees
 	 * @param longitude in degrees
 	 */
-	private Point( double latitude, double longitude ) {
+	private Point(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 
-	public Point computeDestination( double distance, double heading ) {
+	public Point computeDestination(double distance, double heading) {
 		double headingRadian = Math.toRadians( heading );
 
 		// http://www.movable-type.co.uk/scripts/latlong.html
-		double destinationLatitudeRadian = Math.asin( Math.sin( getLatitudeRad() ) * Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) + Math.cos( getLatitudeRad() ) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos( headingRadian ) );
+		double destinationLatitudeRadian = Math.asin(
+				Math.sin( getLatitudeRad() ) * Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) + Math.cos(
+						getLatitudeRad()
+				) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos(
+						headingRadian
+				)
+		);
 
-		double destinationLongitudeRadian = getLongitudeRad() + Math.atan2( Math.sin( headingRadian ) * Math.sin( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) * Math.cos( getLatitudeRad() ), Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) - Math.sin( getLatitudeRad() ) * Math.sin( destinationLatitudeRadian ) );
+		double destinationLongitudeRadian = getLongitudeRad() + Math.atan2(
+				Math.sin( headingRadian ) * Math.sin(
+						distance / GeometricConstants.EARTH_MEAN_RADIUS_KM
+				) * Math.cos( getLatitudeRad() ),
+				Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) - Math.sin( getLatitudeRad() ) * Math.sin(
+						destinationLatitudeRadian
+				)
+		);
 
 		return fromRadians( destinationLatitudeRadian, destinationLongitudeRadian );
 	}
 
-	public double getDistanceTo( Point other ) {
+	public double getDistanceTo(Point other) {
 		// Spherical Law of Cosines (http://www.movable-type.co.uk/scripts/latlong.html)
-		return Math.acos( Math.sin( getLatitudeRad() ) * Math.sin( other.getLatitudeRad() ) + Math.cos( getLatitudeRad() ) * Math.cos( other.getLatitudeRad() ) * Math.cos( other.getLongitudeRad() - getLongitudeRad() ) ) * GeometricConstants.EARTH_MEAN_RADIUS_KM;
+		return Math.acos(
+				Math.sin( getLatitudeRad() ) * Math.sin( other.getLatitudeRad() ) + Math.cos( getLatitudeRad() ) * Math.cos(
+						other.getLatitudeRad()
+				) * Math.cos( other.getLongitudeRad() - getLongitudeRad() )
+		) * GeometricConstants.EARTH_MEAN_RADIUS_KM;
 	}
 
 	@Override

@@ -20,10 +20,11 @@ final class DistanceFilter extends Filter {
 	private double radius;
 	private String fieldName;
 
-	public DistanceFilter( Filter previousFilter, Point center, double radius, String fieldName ) {
+	public DistanceFilter(Filter previousFilter, Point center, double radius, String fieldName) {
 		if ( previousFilter != null ) {
 			this.previousFilter = previousFilter;
-		} else {
+		}
+		else {
 			this.previousFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
 		}
 		this.center = center;
@@ -32,10 +33,11 @@ final class DistanceFilter extends Filter {
 	}
 
 	@Override
-	public DocIdSet getDocIdSet( IndexReader reader ) throws IOException {
+	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 
 		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLatitude( fieldName ) );
-		final double[] longitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLongitude( fieldName ) );
+		final double[] longitudeValues = FieldCache.DEFAULT
+				.getDoubles( reader, FieldUtils.formatLongitude( fieldName ) );
 
 		DocIdSet docs = previousFilter.getDocIdSet( reader );
 
@@ -45,14 +47,18 @@ final class DistanceFilter extends Filter {
 
 		return new FilteredDocIdSet( docs ) {
 			@Override
-			protected boolean match( int documentIndex ) {
+			protected boolean match(int documentIndex) {
 
 				Double documentDistance;
-				Point documentPosition = Point.fromDegrees( latitudeValues[documentIndex], longitudeValues[documentIndex] );
+				Point documentPosition = Point.fromDegrees(
+						latitudeValues[documentIndex],
+						longitudeValues[documentIndex]
+				);
 				documentDistance = documentPosition.getDistanceTo( center );
 				if ( documentDistance <= radius ) {
 					return true;
-				} else {
+				}
+				else {
 					return false;
 				}
 			}

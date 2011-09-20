@@ -5,6 +5,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -24,7 +25,8 @@ public class IndexingTest {
 			session.save( poi );
 			fullTextSession.index( poi );
 			fullTextSession.flushToIndexes();
-		} catch ( Exception e ) {
+		}
+		catch ( Exception e ) {
 			e.printStackTrace();
 			Assert.fail( "Exception thrown when index point" );
 		}
@@ -42,22 +44,35 @@ public class IndexingTest {
 			List results2 = hibQuery2.list();
 			Assert.assertEquals( 0, results2.size() );
 
-			org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildDistanceQuery( center, 50, "location" );
+			org.apache.lucene.search.Query luceneQuery3 = SpatialQueryBuilder.buildDistanceQuery(
+					center,
+					50,
+					"location"
+			);
 			org.hibernate.Query hibQuery3 = fullTextSession.createFullTextQuery( luceneQuery3, POI.class );
 			List results3 = hibQuery3.list();
 			Assert.assertEquals( 0, results3.size() );
 
-			org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQuery( center, 50, "location" );
+			org.apache.lucene.search.Query luceneQuery4 = SpatialQueryBuilder.buildSpatialQuery(
+					center,
+					50,
+					"location"
+			);
 			org.hibernate.Query hibQuery4 = fullTextSession.createFullTextQuery( luceneQuery4, POI.class );
 			List results4 = hibQuery4.list();
 			Assert.assertEquals( 0, results4.size() );
 
-			org.apache.lucene.search.Query luceneQuery5 = SpatialQueryBuilder.buildSpatialQuery( center, 51, "location" );
+			org.apache.lucene.search.Query luceneQuery5 = SpatialQueryBuilder.buildSpatialQuery(
+					center,
+					51,
+					"location"
+			);
 			org.hibernate.Query hibQuery5 = fullTextSession.createFullTextQuery( luceneQuery5, POI.class );
 			List results5 = hibQuery5.list();
 			Assert.assertEquals( 1, results5.size() );
 
-		} catch ( Exception e ) {
+		}
+		catch ( Exception e ) {
 			e.printStackTrace();
 			Assert.fail( "Exception thrown when querying point" );
 		}

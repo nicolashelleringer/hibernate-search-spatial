@@ -2,6 +2,7 @@ package net.novacodex.hibernate.search.spatial;
 
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -16,7 +17,7 @@ import java.io.FileReader;
 import java.util.List;
 
 public class BenchWithGeonames {
-	public static void main( String args[] ) {
+	public static void main(String args[]) {
 		Session session = null;
 		FullTextSession fullTextSession = null;
 		try {
@@ -49,13 +50,29 @@ public class BenchWithGeonames {
 				session.beginTransaction();
 				fullTextSession = Search.getFullTextSession( session );
 				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
-				q = b.bool().must( b.range().onField( "latitude" ).from( boundingBox.getLowerLeft().getLatitude() ).to( boundingBox.getUpperRight().getLatitude() ).createQuery() ).must( b.range().onField( "longitude" ).from( boundingBox.getLowerLeft().getLongitude() ).to( boundingBox.getUpperRight().getLongitude() ).createQuery() ).createQuery();
+				q = b.bool()
+						.must(
+								b.range()
+										.onField( "latitude" )
+										.from( boundingBox.getLowerLeft().getLatitude() )
+										.to( boundingBox.getUpperRight().getLatitude() )
+										.createQuery()
+						)
+						.must(
+								b.range()
+										.onField( "longitude" )
+										.from( boundingBox.getLowerLeft().getLongitude() )
+										.to( boundingBox.getUpperRight().getLongitude() )
+										.createQuery()
+						)
+						.createQuery();
 				hibQuery = fullTextSession.createFullTextQuery( q, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 				try {
 					hibQuery.getResultSize();
-				} finally {
+				}
+				finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
@@ -68,14 +85,37 @@ public class BenchWithGeonames {
 				session.beginTransaction();
 				fullTextSession = Search.getFullTextSession( session );
 				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
-				q = b.bool().must( b.range().onField( "latitude" ).from( boundingBox.getLowerLeft().getLatitude() ).to( boundingBox.getUpperRight().getLatitude() ).createQuery() ).must( b.range().onField( "longitude" ).from( boundingBox.getLowerLeft().getLongitude() ).to( boundingBox.getUpperRight().getLongitude() ).createQuery() ).createQuery();
-				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery( SpatialQueryBuilder.buildDistanceFilter( new QueryWrapperFilter( q ), center, radius, "location" ) );
+				q = b.bool()
+						.must(
+								b.range()
+										.onField( "latitude" )
+										.from( boundingBox.getLowerLeft().getLatitude() )
+										.to( boundingBox.getUpperRight().getLatitude() )
+										.createQuery()
+						)
+						.must(
+								b.range()
+										.onField( "longitude" )
+										.from( boundingBox.getLowerLeft().getLongitude() )
+										.to( boundingBox.getUpperRight().getLongitude() )
+										.createQuery()
+						)
+						.createQuery();
+				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
+						SpatialQueryBuilder.buildDistanceFilter(
+								new QueryWrapperFilter( q ),
+								center,
+								radius,
+								"location"
+						)
+				);
 				hibQuery = fullTextSession.createFullTextQuery( filteredQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 				try {
 					hibQuery.getResultSize();
-				} finally {
+				}
+				finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
@@ -94,7 +134,8 @@ public class BenchWithGeonames {
 
 				try {
 					hibQuery.getResultSize();
-				} finally {
+				}
+				finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
@@ -113,7 +154,8 @@ public class BenchWithGeonames {
 
 				try {
 					hibQuery.getResultSize();
-				} finally {
+				}
+				finally {
 					endTime = System.nanoTime();
 				}
 				duration = endTime - startTime;
@@ -123,14 +165,39 @@ public class BenchWithGeonames {
 				session.close();
 			}
 
-			System.out.println( " Mean time with Grid : " + Double.toString( (double) gridTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
-			System.out.println( " Mean time with Grid + Distance filter : " + Double.toString( (double) spatialTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
-			System.out.println( " Mean time with DoubleRange : " + Double.toString( (double) doubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
-			System.out.println( " Mean time with DoubleRange + Distance filter : " + Double.toString( (double) distanceDoubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 ) ) );
+			System.out
+					.println(
+							" Mean time with Grid : " + Double.toString(
+									( double ) gridTotalDuration / 100.0d * Math.pow(
+											10,
+											-9
+									)
+							)
+					);
+			System.out
+					.println(
+							" Mean time with Grid + Distance filter : " + Double.toString(
+									( double ) spatialTotalDuration / 100.0d * Math.pow( 10, -9 )
+							)
+					);
+			System.out
+					.println(
+							" Mean time with DoubleRange : " + Double.toString(
+									( double ) doubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 )
+							)
+					);
+			System.out
+					.println(
+							" Mean time with DoubleRange + Distance filter : " + Double.toString(
+									( double ) distanceDoubleRangeTotalDuration / 100.0d * Math.pow( 10, -9 )
+							)
+					);
 
-		} catch ( Exception e ) {
+		}
+		catch ( Exception e ) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if ( session != null && session.isOpen() ) {
 				session.close();
 			}
@@ -155,7 +222,12 @@ public class BenchWithGeonames {
 			int line_number = 0;
 			while ( ( line = buffRead.readLine() ) != null ) {
 				String[] data = line.split( "\t" );
-				POI current = new POI( Integer.parseInt( data[0] ), data[1], Double.parseDouble( data[4] ), Double.parseDouble( data[5] ) );
+				POI current = new POI(
+						Integer.parseInt( data[0] ),
+						data[1],
+						Double.parseDouble( data[4] ),
+						Double.parseDouble( data[5] )
+				);
 				session.save( current );
 				if ( ( line_number % 10000 ) == 0 ) {
 					fullTextSession.flushToIndexes();
@@ -171,9 +243,11 @@ public class BenchWithGeonames {
 			}
 			session.getTransaction().commit();
 			session.close();
-		} catch ( Exception e ) {
+		}
+		catch ( Exception e ) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if ( session != null && session.isOpen() ) {
 				session.close();
 			}

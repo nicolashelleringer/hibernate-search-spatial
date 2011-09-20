@@ -10,19 +10,19 @@ abstract class FieldUtils {
 
 	private static final String GRID_CELL_ID_TEMPLATE = "%s|%s";
 
-	public static String formatFieldName( int gridLevel, String fieldName ) {
+	public static String formatFieldName(int gridLevel, String fieldName) {
 		return String.format( FIELDNAME_TEMPLATE, gridLevel, fieldName );
 	}
 
-	public static String formatLatitude( String fieldName ) {
+	public static String formatLatitude(String fieldName) {
 		return String.format( LATITUDE_TEMPLATE, fieldName );
 	}
 
-	public static String formatLongitude( String fieldName ) {
+	public static String formatLongitude(String fieldName) {
 		return String.format( LONGITUDE_TEMPLATE, fieldName );
 	}
 
-	public static String formatGridCellId( int xIndex, int yIndex ) {
+	public static String formatGridCellId(int xIndex, int yIndex) {
 		return String.format( GRID_CELL_ID_TEMPLATE, xIndex, yIndex );
 	}
 
