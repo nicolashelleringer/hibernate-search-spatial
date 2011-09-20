@@ -35,9 +35,9 @@ final class DistanceFilter extends Filter {
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 
-		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, FieldUtils.formatLatitude( fieldName ) );
+		final double[] latitudeValues = FieldCache.DEFAULT.getDoubles( reader, GridHelper.formatLatitude( fieldName ) );
 		final double[] longitudeValues = FieldCache.DEFAULT
-				.getDoubles( reader, FieldUtils.formatLongitude( fieldName ) );
+				.getDoubles( reader, GridHelper.formatLongitude( fieldName ) );
 
 		DocIdSet docs = previousFilter.getDocIdSet( reader );
 

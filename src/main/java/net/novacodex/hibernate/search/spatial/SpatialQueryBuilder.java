@@ -24,12 +24,12 @@ public abstract class SpatialQueryBuilder {
 	 * @see Filter
 	 */
 	public static Filter buildGridFilter(Point center, double radius, String fieldName) {
-		int bestGridLevel = GridManager.findBestGridLevelForSearchRange( 2.0d * radius );
+		int bestGridLevel = GridHelper.findBestGridLevelForSearchRange( 2.0d * radius );
 		if ( bestGridLevel > SpatialFieldBridge.MAX_GRID_LEVEL ) {
 			bestGridLevel = SpatialFieldBridge.MAX_GRID_LEVEL;
 		}
-		List<String> gridCellsIds = GridManager.getGridCellsIds( center, radius, bestGridLevel );
-		return new GridFilter( gridCellsIds, FieldUtils.formatFieldName( bestGridLevel, fieldName ) );
+		List<String> gridCellsIds = GridHelper.getGridCellsIds( center, radius, bestGridLevel );
+		return new GridFilter( gridCellsIds, GridHelper.formatFieldName( bestGridLevel, fieldName ) );
 	}
 
 	/**

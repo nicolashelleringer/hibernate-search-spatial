@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-abstract class GridManager {
+abstract class GridHelper {
 
 	private static final double LOG2 = Math.log( 2 );
 
@@ -25,7 +25,7 @@ abstract class GridManager {
 				GeometricConstants.PROJECTED_LATITUDE_RANGE,
 				gridLevel
 		);
-		return FieldUtils.formatGridCellId( longitudeCellIndex, latitudeCellIndex );
+		return formatGridCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
 	public static Map<Integer, String> getGridCellsIds(Point point, int minGridLevel, int maxGridLevel) {
@@ -91,7 +91,7 @@ abstract class GridManager {
 		int xIndex, yIndex;
 		for ( xIndex = startX; xIndex <= endX; xIndex++ ) {
 			for ( yIndex = startY; yIndex <= endY; yIndex++ ) {
-				gridCellsIds.add( FieldUtils.formatGridCellId( xIndex, yIndex ) );
+				gridCellsIds.add( formatGridCellId( xIndex, yIndex ) );
 			}
 		}
 
@@ -147,5 +147,29 @@ abstract class GridManager {
 		projectedCoordinates[1] = point.getLatitudeRad();
 
 		return projectedCoordinates;
+	}
+
+	private static final String FIELDNAME_TEMPLATE = "HSSI_%s_%s";
+
+	private static final String LATITUDE_TEMPLATE = "HSSI_Latitude_%s";
+
+	private static final String LONGITUDE_TEMPLATE = "HSSI_Longitude_%s";
+
+	private static final String GRID_CELL_ID_TEMPLATE = "%s|%s";
+
+	public static String formatFieldName(int gridLevel, String fieldName) {
+		return String.format( FIELDNAME_TEMPLATE, gridLevel, fieldName );
+	}
+
+	public static String formatLatitude(String fieldName) {
+		return String.format( LATITUDE_TEMPLATE, fieldName );
+	}
+
+	public static String formatLongitude(String fieldName) {
+		return String.format( LONGITUDE_TEMPLATE, fieldName );
+	}
+
+	public static String formatGridCellId(int xIndex, int yIndex) {
+		return String.format( GRID_CELL_ID_TEMPLATE, xIndex, yIndex );
 	}
 }
