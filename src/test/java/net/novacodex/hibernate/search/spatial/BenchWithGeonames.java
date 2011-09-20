@@ -2,17 +2,13 @@ package net.novacodex.hibernate.search.spatial;
 
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
-import org.apache.solr.util.NumberUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.hibernate.search.bridge.util.NumericFieldUtils;
 import org.hibernate.search.query.dsl.QueryBuilder;
-import org.hibernate.search.query.hibernate.impl.FullTextQueryImpl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -73,7 +69,7 @@ public class BenchWithGeonames {
 				fullTextSession = Search.getFullTextSession( session );
 				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 				q = b.bool().must( b.range().onField( "latitude" ).from( boundingBox.getLowerLeft().getLatitude() ).to( boundingBox.getUpperRight().getLatitude() ).createQuery() ).must( b.range().onField( "longitude" ).from( boundingBox.getLowerLeft().getLongitude() ).to( boundingBox.getUpperRight().getLongitude() ).createQuery() ).createQuery();
-				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery( SpatialQueryBuilder.createDistanceFilter( new QueryWrapperFilter( q ), center, radius, "location" ) );
+				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery( SpatialQueryBuilder.buildDistanceFilter( new QueryWrapperFilter( q ), center, radius, "location" ) );
 				hibQuery = fullTextSession.createFullTextQuery( filteredQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();

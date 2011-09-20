@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class SpatialQueryBuilder {
 
-	public static Filter createGridFilter( Point center, double radius, String fieldName ) {
+	public static Filter buildGridFilter( Point center, double radius, String fieldName ) {
 		int bestGridLevel = GridManager.findBestGridLevelForSearchRange( 2.0d * radius );
 		if ( bestGridLevel > SpatialFieldBridge.MAX_GRID_LEVEL ) {
 			bestGridLevel = SpatialFieldBridge.MAX_GRID_LEVEL;
@@ -19,20 +19,20 @@ public abstract class SpatialQueryBuilder {
 		return new GridFilter( gridCellsIds, FieldUtils.formatFieldName( bestGridLevel, fieldName ) );
 	}
 
-	public static Filter createDistanceFilter( Filter previousFilter, Point center, double radius, String fieldName ) {
+	public static Filter buildDistanceFilter( Filter previousFilter, Point center, double radius, String fieldName ) {
 		return new DistanceFilter( previousFilter, center, radius, fieldName );
 	}
 
 	public static Query buildGridQuery( Point center, double radius, String fieldName ) {
-		return new ConstantScoreQuery( createGridFilter( center, radius, fieldName ) );
+		return new ConstantScoreQuery( buildGridFilter( center, radius, fieldName ) );
 	}
 
 	public static Query buildDistanceQuery( Point center, double radius, String fieldName ) {
 		Filter allFilter = new QueryWrapperFilter( new MatchAllDocsQuery() );
-		return new ConstantScoreQuery( createDistanceFilter( allFilter, center, radius, fieldName ) );
+		return new ConstantScoreQuery( buildDistanceFilter( allFilter, center, radius, fieldName ) );
 	}
 
 	public static Query buildSpatialQuery( Point center, double radius, String fieldName ) {
-		return new ConstantScoreQuery( createDistanceFilter( createGridFilter( center, radius, fieldName ), center, radius, fieldName ) );
+		return new ConstantScoreQuery( buildDistanceFilter( buildGridFilter( center, radius, fieldName ), center, radius, fieldName ) );
 	}
 }
