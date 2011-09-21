@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -42,37 +43,33 @@ public class BenchWithGeonames {
 			long startTime, endTime, duration;
 			FullTextQuery hibQuery;
 			List results;
-			QueryBuilder b;
-			org.apache.lucene.search.Query q;
+			final QueryBuilder queryBuilder= fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+			org.apache.lucene.search.Query query;
 			final Integer iterations = 200;
 			final Integer warmUp = 25;
 
 			for ( int i = 0; i < iterations; i++ ) {
-				Point center = Point.fromDegrees( Math.random() * 180 - 90, Math.random() * 360 - 180 );
+				Point center = Point.fromDegrees( Math.random() * 2 + 44 , Math.random() * 2 + 3 );
 				double radius = 25.0d;
 				Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
 
-				session = sessionFactory.openSession();
-				session.beginTransaction();
-				fullTextSession = Search.getFullTextSession( session );
-				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
-				q = b.bool()
+				query = queryBuilder.bool()
 						.must(
-								b.range()
+								queryBuilder.range()
 										.onField( "latitude" )
 										.from( boundingBox.getLowerLeft().getLatitude() )
 										.to( boundingBox.getUpperRight().getLatitude() )
 										.createQuery()
 						)
 						.must(
-								b.range()
+								queryBuilder.range()
 										.onField( "longitude" )
 										.from( boundingBox.getLowerLeft().getLongitude() )
 										.to( boundingBox.getUpperRight().getLongitude() )
 										.createQuery()
 						)
 						.createQuery();
-				hibQuery = fullTextSession.createFullTextQuery( q, POI.class );
+				hibQuery = fullTextSession.createFullTextQuery( query, POI.class );
 				hibQuery.setProjection( "id", "name" );
 				startTime = System.nanoTime();
 				try {
@@ -85,22 +82,18 @@ public class BenchWithGeonames {
 				if ( i > ( iterations - warmUp ) ) {
 					doubleRangeTotalDuration += duration;
 				}
-				session.close();
+				session.clear();
 
-				session = sessionFactory.openSession();
-				session.beginTransaction();
-				fullTextSession = Search.getFullTextSession( session );
-				b = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
-				q = b.bool()
+				query = queryBuilder.bool()
 						.must(
-								b.range()
+								queryBuilder.range()
 										.onField( "latitude" )
 										.from( boundingBox.getLowerLeft().getLatitude() )
 										.to( boundingBox.getUpperRight().getLatitude() )
 										.createQuery()
 						)
 						.must(
-								b.range()
+								queryBuilder.range()
 										.onField( "longitude" )
 										.from( boundingBox.getLowerLeft().getLongitude() )
 										.to( boundingBox.getUpperRight().getLongitude() )
@@ -109,7 +102,7 @@ public class BenchWithGeonames {
 						.createQuery();
 				org.apache.lucene.search.Query filteredQuery = new ConstantScoreQuery(
 						SpatialQueryBuilder.buildDistanceFilter(
-								new QueryWrapperFilter( q ),
+								new QueryWrapperFilter( query ),
 								center,
 								radius,
 								"location"
@@ -128,11 +121,8 @@ public class BenchWithGeonames {
 				if ( i > ( iterations - warmUp ) ) {
 					distanceDoubleRangeTotalDuration += duration;
 				}
-				session.close();
+				session.clear();
 
-				session = sessionFactory.openSession();
-				session.beginTransaction();
-				fullTextSession = Search.getFullTextSession( session );
 				luceneQuery = SpatialQueryBuilder.buildGridQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
@@ -148,11 +138,8 @@ public class BenchWithGeonames {
 				if ( i > ( iterations - warmUp ) ) {
 					gridTotalDuration += duration;
 				}
-				session.close();
+				session.clear();
 
-				session = sessionFactory.openSession();
-				session.beginTransaction();
-				fullTextSession = Search.getFullTextSession( session );
 				luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, radius, "location" );
 				hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 				hibQuery.setProjection( "id", "name" );
@@ -168,8 +155,10 @@ public class BenchWithGeonames {
 				if ( i > ( iterations - warmUp ) ) {
 					spatialTotalDuration += duration;
 				}
-				session.close();
+				session.clear();
 			}
+			session.getTransaction().commit();
+			session.close();
 
 			System.out
 					.println(
@@ -205,11 +194,15 @@ public class BenchWithGeonames {
 		}
 		finally {
 			if ( session != null && session.isOpen() ) {
+				Transaction transaction= session.getTransaction();
+				if(transaction!=null && transaction.isActive()){
+					transaction.rollback();
+				}
 				session.close();
 			}
 		}
 	}
-	
+
 	@Test
 	public void LoadGeonames() {
 		Session session = null;
@@ -279,29 +272,35 @@ public class BenchWithGeonames {
 
 		Point center = Point.fromDegrees( 46, 4 );
 		double radius = 50.0d;
-		
+
 		luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, radius, "location" );
 		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
 		hibQuery.setProjection( "id", "name", "type" );
 
-		FacetManager facetManager= hibQuery.getFacetManager();
+		FacetManager facetManager = hibQuery.getFacetManager();
 
 		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
 
-		FacetingRequest facetingRequest= queryBuilder.facet().name( "typeFacet").onField( "type" ).discrete().orderedBy( FacetSortOrder.COUNT_DESC ).includeZeroCounts( false ).createFacetingRequest();
+		FacetingRequest facetingRequest = queryBuilder.facet()
+				.name( "typeFacet" )
+				.onField( "type" )
+				.discrete()
+				.orderedBy( FacetSortOrder.COUNT_DESC )
+				.includeZeroCounts( false )
+				.createFacetingRequest();
 
 		facetManager.enableFaceting( facetingRequest );
-		
+
 
 		try {
 
-			Integer size= hibQuery.getResultSize();
+			Integer size = hibQuery.getResultSize();
 
-			List list= hibQuery.list();
+			List list = hibQuery.list();
 
-			List<Facet> facets= facetManager.getFacets( "typeFacet" );
+			List<Facet> facets = facetManager.getFacets( "typeFacet" );
 
-			System.out.println(facets);
+			System.out.println( facets );
 
 		}
 		catch ( Exception e ) {
