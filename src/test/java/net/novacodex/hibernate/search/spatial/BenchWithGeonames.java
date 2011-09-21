@@ -2,6 +2,7 @@ package net.novacodex.hibernate.search.spatial;
 
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.QueryWrapperFilter;
+import org.junit.Test;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -10,6 +11,10 @@ import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
 import org.hibernate.search.query.dsl.QueryBuilder;
+import org.hibernate.search.query.engine.spi.FacetManager;
+import org.hibernate.search.query.facet.Facet;
+import org.hibernate.search.query.facet.FacetSortOrder;
+import org.hibernate.search.query.facet.FacetingRequest;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,6 +26,7 @@ public class BenchWithGeonames {
 		Session session = null;
 		FullTextSession fullTextSession = null;
 		try {
+
 			SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
 			session = sessionFactory.openSession();
@@ -203,7 +209,8 @@ public class BenchWithGeonames {
 			}
 		}
 	}
-
+	
+	@Test
 	public void LoadGeonames() {
 		Session session = null;
 		FullTextSession fullTextSession = null;
@@ -214,7 +221,7 @@ public class BenchWithGeonames {
 			session.beginTransaction();
 			fullTextSession = Search.getFullTextSession( session );
 
-			String geonamesFileName = "geonames\\allcountries.txt";
+			String geonamesFileName = "geonames\\FR.txt";
 			File geonamesFiles = new File( geonamesFileName );
 			BufferedReader buffRead = new BufferedReader( new FileReader( geonamesFiles ) );
 			String line = null;
@@ -226,7 +233,8 @@ public class BenchWithGeonames {
 						Integer.parseInt( data[0] ),
 						data[1],
 						Double.parseDouble( data[4] ),
-						Double.parseDouble( data[5] )
+						Double.parseDouble( data[5] ),
+						data[7]
 				);
 				session.save( current );
 				if ( ( line_number % 10000 ) == 0 ) {
@@ -251,6 +259,53 @@ public class BenchWithGeonames {
 			if ( session != null && session.isOpen() ) {
 				session.close();
 			}
+		}
+	}
+
+	@Test
+	public void FacetTest() {
+		Session session = null;
+		FullTextSession fullTextSession = null;
+
+		SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
+
+		session = sessionFactory.openSession();
+		session.beginTransaction();
+		fullTextSession = Search.getFullTextSession( session );
+
+		org.apache.lucene.search.Query luceneQuery;
+
+		FullTextQuery hibQuery;
+
+		Point center = Point.fromDegrees( 46, 4 );
+		double radius = 50.0d;
+		
+		luceneQuery = SpatialQueryBuilder.buildSpatialQuery( center, radius, "location" );
+		hibQuery = fullTextSession.createFullTextQuery( luceneQuery, POI.class );
+		hibQuery.setProjection( "id", "name", "type" );
+
+		FacetManager facetManager= hibQuery.getFacetManager();
+
+		QueryBuilder queryBuilder = fullTextSession.getSearchFactory().buildQueryBuilder().forEntity( POI.class ).get();
+
+		FacetingRequest facetingRequest= queryBuilder.facet().name( "typeFacet").onField( "type" ).discrete().orderedBy( FacetSortOrder.COUNT_DESC ).includeZeroCounts( false ).createFacetingRequest();
+
+		facetManager.enableFaceting( facetingRequest );
+		
+
+		try {
+
+			Integer size= hibQuery.getResultSize();
+
+			List list= hibQuery.list();
+
+			List<Facet> facets= facetManager.getFacets( "typeFacet" );
+
+			System.out.println(facets);
+
+		}
+		catch ( Exception e ) {
+
 		}
 	}
 }
