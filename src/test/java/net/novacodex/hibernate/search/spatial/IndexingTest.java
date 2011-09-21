@@ -15,7 +15,7 @@ public class IndexingTest {
 
 	@Test
 	public void indexingTest() {
-		POI poi = new POI( 1, "Test", 24.0d, 32.0d );
+		POI poi = new POI( 1, "Test", 24.0d, 32.0d, "" );
 
 		SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 		Session session = sessionFactory.openSession();

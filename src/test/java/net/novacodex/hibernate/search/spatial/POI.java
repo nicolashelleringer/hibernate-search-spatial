@@ -11,6 +11,8 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.h2.command.ddl.Analyze;
+
 @Entity
 @Indexed
 public class POI {
@@ -20,6 +22,9 @@ public class POI {
 	@Field(store = Store.YES)
 	String name;
 
+	@Field(store = Store.YES)
+	String type;
+
 	@Field(store = Store.YES, index = Index.UN_TOKENIZED)
 	@NumericField
 	double latitude;
@@ -27,7 +32,7 @@ public class POI {
 	@NumericField
 	double longitude;
 
-	@Field(store = Store.YES)
+	@Field(store = Store.YES, index = Index.UN_TOKENIZED)
 	@FieldBridge(impl = SpatialFieldBridge.class)
 	@Embedded
 	public SpatialIndexable getLocation() {
@@ -44,11 +49,12 @@ public class POI {
 		};
 	}
 
-	public POI(Integer id, String name, double latitude, double longitude) {
+	public POI(Integer id, String name, double latitude, double longitude, String type) {
 		this.id = id;
 		this.name = name;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.type= type;
 	}
 
 	public POI() {
@@ -69,4 +75,9 @@ public class POI {
 	public double getLongitude() {
 		return longitude;
 	}
+
+	public String getType() {
+		return type;
+	}
+
 }
