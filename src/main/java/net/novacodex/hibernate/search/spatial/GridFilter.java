@@ -10,6 +10,15 @@ import org.apache.lucene.util.OpenBitSet;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author Nicolas Helleringer
+ *         <p/>
+ *         Lucene Filter for filtering documents which have been indexed with Hibernate Search Spatial SpatialFieldBridge
+ *         <p/>
+ *         Use denormalized Grid Cell Ids to return a sub set of documents near the center
+ * @see SpatialFieldBridge
+ * @see SpatialIndexable
+ */
 final class GridFilter extends Filter {
 
 	private final List<String> gridCellsIds;
@@ -20,6 +29,11 @@ final class GridFilter extends Filter {
 		this.fieldName = fieldName;
 	}
 
+	/**
+	 * Returns Doc Ids by searching the index for document having the correct Grid Cell Id at given grid level
+	 *
+	 * @param reader reader to the index
+	 */
 	@Override
 	public DocIdSet getDocIdSet(IndexReader reader) throws IOException {
 		if ( gridCellsIds.size() == 0 ) {

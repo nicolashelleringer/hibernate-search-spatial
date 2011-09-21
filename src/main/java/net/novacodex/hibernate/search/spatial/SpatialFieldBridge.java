@@ -8,6 +8,11 @@ import org.hibernate.search.bridge.ParameterizedBridge;
 
 import java.util.Map;
 
+/**
+ * @author Nicolas Helleringer
+ *         <p/>
+ *         Hibernate Search field bridge, binding a SpatialIndexable to Grid field in the index
+ */
 public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 
 	public static final int MIN_GRID_LEVEL = 0;
@@ -16,6 +21,14 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 	private int min_grid_level = MIN_GRID_LEVEL;
 	private int max_grid_level = MAX_GRID_LEVEL;
 
+	/**
+	 * Actual overridden method that does the indexing
+	 *
+	 * @param name of the field
+	 * @param value of the field
+	 * @param document document beeing indexed
+	 * @param luceneOptions current indexing options and accessors
+	 */
 	@Override
 	public void set(String name, Object value, Document document, LuceneOptions luceneOptions) {
 		if ( value != null ) {
@@ -41,6 +54,11 @@ public class SpatialFieldBridge implements FieldBridge, ParameterizedBridge {
 		}
 	}
 
+	/**
+	 * Override method for default min and max grid level
+	 *
+	 * @param parameters Map containing the min_grid_level and max_grid_level values
+	 */
 	@Override
 	public void setParameterValues(Map parameters) {
 		Object min_grid_level = parameters.get( "min_grid_level" );

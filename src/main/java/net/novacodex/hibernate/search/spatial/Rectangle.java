@@ -1,5 +1,11 @@
 package net.novacodex.hibernate.search.spatial;
 
+/**
+ * @author Nicolas Helleringer
+ * @author Mathieu Perez
+ *         <p/>
+ *         Bounding box older for search area on Earth
+ */
 final class Rectangle {
 
 	private final Point lowerLeft;
@@ -10,6 +16,16 @@ final class Rectangle {
 		this.upperRight = upperRight;
 	}
 
+	/**
+	 * Compute appropriate bouding box on Earth with pole and prime meridian crossing checks
+	 *
+	 * @param center of the search area
+	 * @param radius of the search area
+	 *
+	 * @return a bouding box for the area
+	 *
+	 * @see <a href="http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates">Bouding box on Earth calculation</a>
+	 */
 	public static Rectangle fromBoundingCircle(Point center, double radius) {
 		// http://janmatuschek.de/LatitudeLongitudeBoundingCoordinates
 		double minimumLatitude, maximumLatitude;

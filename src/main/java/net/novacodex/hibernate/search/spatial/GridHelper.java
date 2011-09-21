@@ -5,14 +5,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Nicolas Helleringer
+ * @author Mathieu Perez
+ *         <p/>
+ *         Grid fields,Ids generator and geometric calculation methods for use in SpatialFieldBridge
+ * @see SpatialFieldBridge
+ */
 abstract class GridHelper {
 
 	private static final double LOG2 = Math.log( 2 );
 
+	/**
+	 * Generate a Cell Index on one axis
+	 *
+	 * @param coordinate position to compute the Index for
+	 * @param range range of the axis (-pi,pi)/(-90,90) => 2*pi/180 e.g
+	 * @param gridLevel Hox many time the range has been split in two
+	 */
 	public static int getCellIndex(double coordinate, double range, int gridLevel) {
 		return ( int ) Math.floor( Math.pow( 2, gridLevel ) * coordinate / range );
 	}
 
+	/**
+	 * Generate a Grid Cell Id (with both Cell Index on both dimension in it) for a position
+	 *
+	 * @param point position to compute the Grid Cell Id for
+	 * @param gridLevel Hox many time the dimensions have been split in two
+	 */
 	public static String getGridCellId(Point point, int gridLevel) {
 		double[] indexablesCoordinates = projectToIndexSpace( point );
 		int longitudeCellIndex = getCellIndex(
@@ -28,6 +48,13 @@ abstract class GridHelper {
 		return formatGridCellId( longitudeCellIndex, latitudeCellIndex );
 	}
 
+	/**
+	 * Generate a Grid Cell Ids List for a position on all level between min and max
+	 *
+	 * @param point point position to compute the Grid Cell Ids for
+	 * @param minGridLevel minimum level of Grid to compute the Grid Cell Id for
+	 * @param maxGridLevel maximum level of Grid to compute the Grid Cell Id for
+	 */
 	public static Map<Integer, String> getGridCellsIds(Point point, int minGridLevel, int maxGridLevel) {
 		if ( minGridLevel < 0 || maxGridLevel < minGridLevel ) {
 			return null;
@@ -42,6 +69,13 @@ abstract class GridHelper {
 		return gridCellIds;
 	}
 
+	/**
+	 * Generate a Grid Cell Ids List covered by a bounding box
+	 *
+	 * @param lowerLeft lower left corner of the bounding box
+	 * @param upperRight upper right corner of the bouding box
+	 * @param gridLevel grid level of the wanted cell ids
+	 */
 	public static List<String> getGridCellsIds(Point lowerLeft, Point upperRight, int gridLevel) {
 		double[] projectedLowerLeft = projectToIndexSpace( lowerLeft );
 		int lowerLeftXIndex = getCellIndex(
@@ -98,6 +132,13 @@ abstract class GridHelper {
 		return gridCellsIds;
 	}
 
+	/**
+	 * Generate a Grid Cell Ids List for the bouding box of a circular search area
+	 *
+	 * @param center center of the search area
+	 * @param radius radius of the search area
+	 * @param gridLevel grid level of the wanted cell ids
+	 */
 	public static List<String> getGridCellsIds(Point center, double radius, int gridLevel) {
 
 		Rectangle boundingBox = Rectangle.fromBoundingCircle( center, radius );
@@ -133,6 +174,15 @@ abstract class GridHelper {
 		}
 	}
 
+	/**
+	 * Return the best Grid level for a given search radius.
+	 * If point are searched at d distance from a point, a certain grid cell level will problem grid cell that are
+	 * big enough to contain the search area but the smallest possible. By returning this level we ensure 4 Grid Cell
+	 * maximum will be needed to coverd the search area (2 max on each axis because of search area crossing fixed bonds
+	 * of the grid cells)
+	 *
+	 * @param searchRange search range to be covered by the grid cells
+	 */
 	public static int findBestGridLevelForSearchRange(double searchRange) {
 
 		double iterations = GeometricConstants.EARTH_EQUATOR_CIRCUMFERENCE_KM / ( 2.0d * searchRange );
@@ -140,6 +190,13 @@ abstract class GridHelper {
 		return ( int ) Math.ceil( Math.log( iterations ) / LOG2 );
 	}
 
+	/**
+	 * Project a degre latitude/longitude point into a sinusoidal projection planar space for grid cell ids computation
+	 *
+	 * @param point point to be projected
+	 *
+	 * @return array of projected coordinates
+	 */
 	public static double[] projectToIndexSpace(Point point) {
 		double[] projectedCoordinates = new double[2];
 

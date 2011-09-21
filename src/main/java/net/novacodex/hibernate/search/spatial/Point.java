@@ -1,5 +1,11 @@
 package net.novacodex.hibernate.search.spatial;
 
+/**
+ * @author Nicolas Helleringer
+ * @author Mathieu Perez
+ *         <p/>
+ *         Normalized latitude,longitude holder (in [-90;90],[-180,180]) with distance and destination computations methods
+ */
 final class Point implements SpatialIndexable {
 
 	private final double latitude;
@@ -41,10 +47,19 @@ final class Point implements SpatialIndexable {
 		this.longitude = longitude;
 	}
 
+	/**
+	 * Calculate end of travel point
+	 *
+	 * @param distance to travel
+	 * @param heading of travel
+	 *
+	 * @return arrival point
+	 *
+	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Compute destination</a>
+	 */
 	public Point computeDestination(double distance, double heading) {
 		double headingRadian = Math.toRadians( heading );
 
-		// http://www.movable-type.co.uk/scripts/latlong.html
 		double destinationLatitudeRadian = Math.asin(
 				Math.sin( getLatitudeRad() ) * Math.cos( distance / GeometricConstants.EARTH_MEAN_RADIUS_KM ) + Math.cos(
 						getLatitudeRad()
@@ -65,8 +80,16 @@ final class Point implements SpatialIndexable {
 		return fromRadians( destinationLatitudeRadian, destinationLongitudeRadian );
 	}
 
+	/**
+	 * Compute distance between two points
+	 *
+	 * @param other
+	 *
+	 * @return
+	 *
+	 * @see <a href="http://www.movable-type.co.uk/scripts/latlong.html">Spherical Law of Cosines</a>
+	 */
 	public double getDistanceTo(Point other) {
-		// Spherical Law of Cosines (http://www.movable-type.co.uk/scripts/latlong.html)
 		return Math.acos(
 				Math.sin( getLatitudeRad() ) * Math.sin( other.getLatitudeRad() ) + Math.cos( getLatitudeRad() ) * Math.cos(
 						other.getLatitudeRad()

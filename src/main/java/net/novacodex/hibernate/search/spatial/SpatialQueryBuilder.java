@@ -8,6 +8,12 @@ import org.apache.lucene.search.QueryWrapperFilter;
 
 import java.util.List;
 
+/**
+ * @author Nicolas Helleringer
+ *
+ * The SpatialQueryBuilder hold builder methods for Grid, Distance and Spatial (Grid+Distance) filters and queries
+ *
+ */
 public abstract class SpatialQueryBuilder {
 	/**
 	 * Returns a Lucene filter which rely on Hibernate Search Spatial
@@ -17,7 +23,7 @@ public abstract class SpatialQueryBuilder {
 	 * @param radius distance max to center
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
-	 * @return Lucene filter to be use in a Query
+	 * @return Lucene filter to be used in a Query
 	 *
 	 * @see	Query
 	 * @see	SpatialIndexable
@@ -39,7 +45,7 @@ public abstract class SpatialQueryBuilder {
 	 * @param radius distance max to center
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
-	 * @return Lucene filter to be use in a Query
+	 * @return Lucene filter to be used in a Query
 	 *
 	 * @param	previousFilter	preceding filter in filter chain
 	 * Warning if passed null DistanceFilter constructor use a
@@ -62,7 +68,7 @@ public abstract class SpatialQueryBuilder {
 	 * @param radius distance max to center
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
-	 * @return Lucene Query to be use in a search
+	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
 	 * @see	SpatialIndexable
@@ -80,7 +86,7 @@ public abstract class SpatialQueryBuilder {
 	 * @param radius distance max to center
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
-	 * @return Lucene Query to be use in a search
+	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
 	 * @see	SpatialIndexable
@@ -99,7 +105,7 @@ public abstract class SpatialQueryBuilder {
 	 * @param radius distance max to center
 	 * @param fieldName name of the Lucene Field implementing SpatialIndexable
 	 *
-	 * @return Lucene Query to be use in a search
+	 * @return Lucene Query to be used in a search
 	 *
 	 * @see	Query
 	 * @see	SpatialIndexable

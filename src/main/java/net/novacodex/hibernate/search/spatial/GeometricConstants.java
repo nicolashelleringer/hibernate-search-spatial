@@ -1,6 +1,14 @@
 package net.novacodex.hibernate.search.spatial;
 
+/**
+ * @author Nicolas Helleringer
+ * @author Mathieu Perez
+ *         <p/>
+ *         Geometric constants to use in GridHelper calculation
+ * @see GridHelper
+ */
 interface GeometricConstants {
+
 	int LONGITUDE_DEGREE_RANGE = 360;
 	int LONGITUDE_DEGREE_MIN = -LONGITUDE_DEGREE_RANGE / 2;
 	int LONGITUDE_DEGREE_MAX = LONGITUDE_DEGREE_RANGE / 2;
