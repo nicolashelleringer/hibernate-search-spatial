@@ -1,6 +1,6 @@
-Hibernate Search
+Hibernate Search Spatial
 ==================================================
-Version: 4.0.0.Beta1 14-09-2011
+Version: 1.0-SNAPSHOT 22 September 2011
 
 Description
 -----------
