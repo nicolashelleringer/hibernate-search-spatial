@@ -1,6 +1,6 @@
 Hibernate Search Spatial
 ==================================================
-Version: 1.0-SNAPSHOT 22 September 2011
+Version: 1.0-SNAPSHOT 28 november 2011
 
 Description
 -----------
@@ -12,7 +12,8 @@ full text queries by location.
 - Grid Filter for rapid too broad extraction of localised document/entities
 
 This version of Hibernate Search Spatial requires:
- - Hibernate Search 3.4.1
+ - Hibernate Search 4.0.0.CR2
+ - Hibernatet Core 4.0.0.CR6
 
 Instructions
 ------------
