@@ -24,12 +24,12 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-search</artifactId>
-			<version>3.4.1.Final</version>
+			<version>4.0.0.CR2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-			<version>3.6.7.Final</version>
+			<version>4.0.0.CR6</version>
 		</dependency>
 		<!-- Logs -->
 		<dependency>
